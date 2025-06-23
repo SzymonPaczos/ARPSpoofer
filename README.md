@@ -1,200 +1,186 @@
-# ARP Spoofing Tool - C++
+# ARP Spoofing Tool
 
-Modern implementation of ARP spoofing tool written in C++17, using smart pointers, atomics, callbacks and design patterns. The program is cross-platform and requires no external dependencies.
+A modern, cross-platform ARP spoofing tool written in C++17. This tool demonstrates ARP spoofing attacks for educational and testing purposes.
 
-## 🎯 **Key Concepts**
+## Features
 
-### **Victim**
-- This is a host that **does not know** it is being attacked
-- Its network traffic is intercepted and redirected
-- It thinks it is communicating directly with the target
-- Example: user's computer on the network
+- **Cross-platform support**: Windows and Linux
+- **Modern C++17**: Uses modern C++ features and best practices
+- **Object-oriented design**: Clean architecture with proper abstraction
+- **Raw socket support**: Direct network packet manipulation
+- **Interface detection**: Automatic network interface discovery
+- **MAC address resolution**: ARP table lookup and resolution
+- **Educational purpose**: Designed for learning network security concepts
 
-### **Target**
-- This is a host that the victim is trying to communicate with
-- Can be a default gateway, server, or another computer
-- Example: router, internet server, another computer on the network
+## Architecture
 
-### **One-way Mode**
-- **Normal mode:** We spoof both victim and target
-  - Victim thinks our computer is the target
-  - Target thinks our computer is the victim
-  - We intercept traffic in both directions
+The application uses a platform abstraction layer that provides:
+- `NetworkInterface`: Interface for network operations
+- `RawSocket`: Interface for raw socket operations
+- Platform-specific implementations for Windows and Linux
 
-- **One-way mode:** We only spoof the victim
-  - Victim thinks our computer is the target
-  - Target is not spoofed
-  - We only intercept traffic from victim to target
-  - Traffic from target to victim goes normally
-
-## 🏗️ **Architecture**
-
-The program uses modern design patterns:
-
-### **Singleton Pattern (App)**
-- Central application point
-- Manages attack lifecycle
-- Coordinates all components
-
-### **Abstraction Factory (PlatformFactory)**
-- Creates platform-dependent components
-- Enables easy extension to other systems
-- Encapsulates differences between platforms
-
-### **IPAddress Class**
-Modern class for IPv4 address handling in SFML style:
-
-```cpp
-// Creating IP addresses
-IPAddress ip1("192.168.1.1");
-IPAddress ip2(192, 168, 1, 1);
-IPAddress ip3 = IPAddress::fromString("192.168.1.1");
-
-// Operations on addresses
-if (ip1 == ip2) { /* ... */ }
-if (ip1 < ip2) { /* ... */ }
-IPAddress network = ip1 & mask;
-IPAddress broadcast = ip1 | ~mask;
-
-// Checking address types
-if (ip1.isPrivate()) { /* ... */ }
-if (ip1.isLocalhost()) { /* ... */ }
-if (ip1.isPublic()) { /* ... */ }
-
-// Conversions
-std::string str = ip1.toString();
-uint32_t num = ip1.toUint32();
-std::vector<uint8_t> bytes = ip1.toBytes();
-
-// Predefined addresses
-IPAddress::Any        // 0.0.0.0
-IPAddress::Localhost  // 127.0.0.1
-IPAddress::Broadcast  // 255.255.255.255
-```
-
-## 📁 **File Structure**
+### Class Structure
 
 ```
-arpspoof/
-├── App.hpp/cpp                    # Main application class (Singleton)
-├── IPAddress.hpp/cpp              # IPv4 address handling class
-├── ArpSpoofer.hpp/cpp             # ARP attack execution class
-├── PlatformAbstraction.hpp        # Platform abstractions
-├── WindowsPlatform.hpp/cpp        # Windows implementation
-├── PlatformFactory.cpp            # Component factory
-├── NetworkHeaders.hpp             # Network header definitions
-├── main.cpp                       # Main executable file
-├── arpspoof.vcxproj               # Visual Studio project
-└── README.md                      # This file
+App (Main application logic)
+├── ArpSpoofer (ARP spoofing functionality)
+├── PlatformFactory (Creates platform-specific objects)
+├── NetworkInterface (Abstract interface)
+│   ├── WindowsNetworkInterface (Windows implementation)
+│   └── LinuxNetworkInterface (Linux implementation)
+└── RawSocket (Abstract interface)
+    ├── WindowsRawSocket (Windows implementation)
+    └── LinuxRawSocket (Linux implementation)
 ```
 
-## 🚀 **Compilation**
+## Building
 
-### **Requirements**
-- Visual Studio 2019/2022 with C++17
-- Windows 10/11
-- Administrator privileges
+### Prerequisites
 
-### **Compilation**
-1. Open `arpspoof.vcxproj` in Visual Studio
-2. Select Release x64 configuration
-3. Compile project (Ctrl+Shift+B)
+- **Windows**: Visual Studio 2019 or later with C++17 support
+- **Linux**: GCC 7+ or Clang 5+ with C++17 support
 
-## 📖 **Usage**
+### Windows Build
 
-### **Basic Syntax**
+1. Open `arpspoof.sln` in Visual Studio
+2. Select your target platform (x86 or x64)
+3. Build the solution (Ctrl+Shift+B)
+4. Run as Administrator (required for raw socket access)
+
+### Linux Build
+
+1. **Install dependencies** (if needed):
+   ```bash
+   sudo apt-get update
+   sudo apt-get install build-essential
+   ```
+
+2. **Compile the application**:
+   ```bash
+   make
+   ```
+
+3. **Install system-wide** (optional):
+   ```bash
+   sudo make install
+   ```
+
+4. **Alternative compilation**:
+   ```bash
+   g++ -std=c++17 -Wall -Wextra -O2 -D__linux__ \
+       main.cpp App.cpp ArpSpoofer.cpp IPAddress.cpp \
+       PlatformFactory.cpp LinuxPlatform.cpp \
+       -o arpspoof
+   ```
+
+## Usage
+
+### Windows
+
+```cmd
+# Run as Administrator
+arpspoof.exe [interface_name] [target_ip] [spoofed_ip]
+```
+
+### Linux
+
 ```bash
-arpspoof.exe [OPTIONS] <victim-ip> [target-ip]
+# Run with sudo (required for raw socket access)
+sudo ./arpspoof [interface_name] [target_ip] [spoofed_ip]
+
+# If installed system-wide
+sudo arpspoof [interface_name] [target_ip] [spoofed_ip]
 ```
 
-### **Options**
-- `--help, -h` - Display help
-- `--list, -l` - List network interfaces
-- `--interface, -i` - Specify network interface
-- `--oneway, -o` - One-way mode
-- `--interval, -t` - ARP packet interval (seconds)
-- `--verbose, -v` - Detailed logging
+### Examples
 
-### **Examples**
-
-**List interfaces:**
 ```bash
-arpspoof.exe --list
+# Spoof gateway (192.168.1.1) to target (192.168.1.100)
+sudo ./arpspoof eth0 192.168.1.100 192.168.1.1
+
+# Spoof target to gateway (reverse direction)
+sudo ./arpspoof eth0 192.168.1.1 192.168.1.100
 ```
 
-**Basic attack (victim -> gateway):**
+## Security Notice
+
+⚠️ **WARNING**: This tool is for educational purposes only. Using ARP spoofing on networks you don't own or have explicit permission to test is illegal in many jurisdictions.
+
+## Platform Support
+
+### Windows
+- Uses WinPcap/Npcap for raw socket access
+- Requires Administrator privileges
+- Supports Windows 10/11
+
+### Linux
+- Uses native Linux socket API
+- Requires root privileges (sudo)
+- Supports most Linux distributions
+
+## Development
+
+### Project Structure
+
+```
+arpa/
+├── main.cpp                 # Entry point
+├── App.hpp/cpp             # Main application class
+├── ArpSpoofer.hpp/cpp      # ARP spoofing logic
+├── IPAddress.hpp/cpp       # IP address utilities
+├── PlatformAbstraction.hpp # Abstract interfaces
+├── PlatformFactory.cpp     # Factory for platform objects
+├── WindowsPlatform.hpp/cpp # Windows implementation
+├── LinuxPlatform.hpp/cpp   # Linux implementation
+├── NetworkHeaders.hpp      # Network protocol headers
+├── arpspoof.sln           # Visual Studio solution
+├── arpspoof.vcxproj       # Visual Studio project
+├── Makefile               # Linux build script
+├── README.md              # This file
+└── UML_Diagram.md         # Class diagram
+```
+
+### Adding New Platforms
+
+To add support for a new platform:
+
+1. Create platform-specific header and implementation files
+2. Implement `NetworkInterface` and `RawSocket` interfaces
+3. Update `PlatformFactory.cpp` to include the new platform
+4. Add appropriate preprocessor definitions
+
+## License
+
+This project is for educational purposes. Use responsibly and only on networks you own or have permission to test.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test on both Windows and Linux
+5. Submit a pull request
+
+## Troubleshooting
+
+### Common Issues
+
+**Windows:**
+- "Access denied" - Run as Administrator
+- "WinPcap not found" - Install Npcap
+
+**Linux:**
+- "Permission denied" - Use sudo
+- "Interface not found" - Check interface name with `ip link show`
+- "Operation not permitted" - Ensure CAP_NET_RAW capability
+
+### Debug Mode
+
+**Linux:**
 ```bash
-arpspoof.exe 192.168.1.10
+make debug
+sudo ./arpspoof [args]
 ```
 
-**Attack with specific target:**
-```bash
-arpspoof.exe 192.168.1.10 192.168.1.1
-```
-
-**One-way mode:**
-```bash
-arpspoof.exe --oneway 192.168.1.10
-```
-
-**Specified interface and interval:**
-```bash
-arpspoof.exe -i "Ethernet" -t 5 192.168.1.10
-```
-
-## 🔧 **Features**
-
-### **Automatic Interface Detection**
-The program automatically detects the appropriate network interface based on the victim's IP address.
-
-### **MAC Address Resolution**
-Automatic MAC address resolution using ARP request packets.
-
-### **Traffic Interception**
-The program intercepts network traffic between victim and target and forwards it.
-
-### **Safe Stop**
-After pressing Ctrl+C, the program sends correct ARP packets to restore normal network operation.
-
-## ⚠️ **Warnings**
-
-- **Program requires administrator privileges!**
-- Use only in controlled environment
-- ARP spoofing can disrupt network operation
-- Do not use for unauthorized traffic interception
-
-## 🛡️ **Security**
-
-The program implements the following security measures:
-
-- IP address validation
-- Permission checking
-- Safe memory management (RAII)
-- Error handling and exceptions
-- Safe attack termination
-
-## 🔮 **Extensions**
-
-The program is designed for easy extension:
-
-- **New platforms:** Add implementation in `PlatformAbstraction.hpp`
-- **New protocols:** Extend `NetworkHeaders.hpp`
-- **New features:** Add methods to `App` class
-- **GUI:** Can add graphical interface using callbacks
-
-## 📝 **License**
-
-This project is intended for educational purposes and security testing in controlled environments only.
-
-## 🤝 **Contributing**
-
-The project is open to community contributions. Please:
-
-- Report bugs
-- Suggest new features
-- Code improvements
-- Documentation
-
----
-
-**Note:** Use this tool responsibly and only in environments you control or have permission to test. 
+**Windows:**
+Build in Debug configuration in Visual Studio 
