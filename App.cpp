@@ -146,7 +146,15 @@ bool App::configureAttack(const AttackConfig& config) {
 	
 	// Otwórz raw socket
 	if (!rawSocket->open(attackInfo.interfaceName, true)) {
-		log(0, "Błąd: Nie można otworzyć raw socket. Upewnij się, że uruchamiasz jako administrator!");
+		log(0, "Błąd: Nie można otworzyć raw socket.");
+		log(0, "Wymagane uprawnienia administratora dla:");
+		log(0, "  - Raw socket access (wysyłanie pakietów ARP)");
+		log(0, "  - Promiscuous mode (przechwytywanie ruchu sieciowego)");
+#ifdef _WIN32
+		log(0, "Uruchom program jako Administrator!");
+#else
+		log(0, "Uruchom program z sudo lub ustaw capabilities!");
+#endif
 		return false;
 	}
 	
