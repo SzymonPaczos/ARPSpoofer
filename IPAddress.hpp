@@ -7,42 +7,42 @@
 #include <iostream>
 
 ////////////////////////////////////////////////////////////
-/// \brief Klasa reprezentująca adres IPv4
+/// \brief Class representing IPv4 address
 ///
-/// Klasa ta enkapsuluje adres IPv4 i zapewnia wygodne
-/// operacje na adresach IP w stylu SFML. Zawiera przeciążone
-/// operatory do łatwego porównywania, konwersji i manipulacji
-/// adresami IP.
+/// This class encapsulates an IPv4 address and provides convenient
+/// operations on IP addresses in SFML style. Contains overloaded
+/// operators for easy comparison, conversion and manipulation
+/// of IP addresses.
 ///
-/// Nazwa klasy "IPAddress" pochodzi od:
-/// - "IP" - oznacza protokół Internet Protocol
-/// - "Address" - oznacza adres sieciowy
+/// The class name "IPAddress" comes from:
+/// - "IP" - denotes Internet Protocol
+/// - "Address" - denotes network address
 ///
-/// Klasa używa nowoczesnych funkcji C++17 i zapewnia
-/// bezpieczne zarządzanie pamięcią.
+/// The class uses modern C++17 features and provides
+/// safe memory management.
 ///
 /// \see MACAddress, NetworkUtils
 ///
 ////////////////////////////////////////////////////////////
 class IPAddress {
 private:
-	std::vector<uint8_t> address; ///< Adres IP jako vector 4 bajtów
+	std::vector<uint8_t> address; ///< IP address as vector of 4 bytes
 
 public:
 	////////////////////////////////////////////////////////////
-	/// \brief Konstruktor domyślny
+	/// \brief Default constructor
 	///
-	/// Tworzy pusty adres IP (0.0.0.0).
+	/// Creates empty IP address (0.0.0.0).
 	///
 	////////////////////////////////////////////////////////////
 	IPAddress();
 
 	////////////////////////////////////////////////////////////
-	/// \brief Konstruktor z stringa
+	/// \brief Constructor from string
 	///
-	/// Tworzy adres IP z podanego stringa w formacie kropkowym.
+	/// Creates IP address from given string in dotted format.
 	///
-	/// \param ipString Adres IP w formacie "192.168.1.1"
+	/// \param ipString IP address in "192.168.1.1" format
 	///
 	/// \see fromString()
 	///
@@ -50,88 +50,88 @@ public:
 	explicit IPAddress(const std::string& ipString);
 
 	////////////////////////////////////////////////////////////
-	/// \brief Konstruktor z tablicy bajtów
+	/// \brief Constructor from byte array
 	///
-	/// Tworzy adres IP z tablicy 4 bajtów.
+	/// Creates IP address from array of 4 bytes.
 	///
-	/// \param bytes Tablica 4 bajtów reprezentująca adres IP
+	/// \param bytes Array of 4 bytes representing IP address
 	///
 	////////////////////////////////////////////////////////////
 	explicit IPAddress(const uint8_t bytes[4]);
 
 	////////////////////////////////////////////////////////////
-	/// \brief Konstruktor z vectora bajtów
+	/// \brief Constructor from byte vector
 	///
-	/// Tworzy adres IP z vectora bajtów.
+	/// Creates IP address from byte vector.
 	///
-	/// \param bytes Vector bajtów (musi mieć 4 elementy)
+	/// \param bytes Byte vector (must have 4 elements)
 	///
 	////////////////////////////////////////////////////////////
 	explicit IPAddress(const std::vector<uint8_t>& bytes);
 
 	////////////////////////////////////////////////////////////
-	/// \brief Konstruktor z pojedynczych bajtów
+	/// \brief Constructor from individual bytes
 	///
-	/// Tworzy adres IP z 4 pojedynczych bajtów.
+	/// Creates IP address from 4 individual bytes.
 	///
-	/// \param b1 Pierwszy bajt
-	/// \param b2 Drugi bajt
-	/// \param b3 Trzeci bajt
-	/// \param b4 Czwarty bajt
+	/// \param b1 First byte
+	/// \param b2 Second byte
+	/// \param b3 Third byte
+	/// \param b4 Fourth byte
 	///
 	////////////////////////////////////////////////////////////
 	IPAddress(uint8_t b1, uint8_t b2, uint8_t b3, uint8_t b4);
 
 	////////////////////////////////////////////////////////////
-	/// \brief Konstruktor kopiujący
+	/// \brief Copy constructor
 	///
-	/// \param other Adres IP do skopiowania
+	/// \param other IP address to copy
 	///
 	////////////////////////////////////////////////////////////
 	IPAddress(const IPAddress& other) = default;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Operator przypisania kopiujący
+	/// \brief Copy assignment operator
 	///
-	/// \param other Adres IP do przypisania
+	/// \param other IP address to assign
 	///
-	/// \return IPAddress& Referencja do tego obiektu
+	/// \return IPAddress& Reference to this object
 	///
 	////////////////////////////////////////////////////////////
 	IPAddress& operator=(const IPAddress& other) = default;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Konstruktor przenoszący
+	/// \brief Move constructor
 	///
-	/// \param other Adres IP do przeniesienia
+	/// \param other IP address to move
 	///
 	////////////////////////////////////////////////////////////
 	IPAddress(IPAddress&& other) noexcept = default;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Operator przypisania przenoszący
+	/// \brief Move assignment operator
 	///
-	/// \param other Adres IP do przeniesienia
+	/// \param other IP address to move
 	///
-	/// \return IPAddress& Referencja do tego obiektu
+	/// \return IPAddress& Reference to this object
 	///
 	////////////////////////////////////////////////////////////
 	IPAddress& operator=(IPAddress&& other) noexcept = default;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Destruktor
+	/// \brief Destructor
 	///
-	/// Automatycznie zwalnia zasoby.
+	/// Automatically releases resources.
 	///
 	////////////////////////////////////////////////////////////
 	~IPAddress() = default;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Operator porównania równości
+	/// \brief Equality comparison operator
 	///
-	/// \param other Adres IP do porównania
+	/// \param other IP address to compare
 	///
-	/// \return bool true jeśli adresy są identyczne
+	/// \return bool true if addresses are identical
 	///
 	/// \see operator!=()
 	///
@@ -139,11 +139,11 @@ public:
 	bool operator==(const IPAddress& other) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Operator porównania nierówności
+	/// \brief Inequality comparison operator
 	///
-	/// \param other Adres IP do porównania
+	/// \param other IP address to compare
 	///
-	/// \return bool true jeśli adresy są różne
+	/// \return bool true if addresses are different
 	///
 	/// \see operator==()
 	///
@@ -151,13 +151,13 @@ public:
 	bool operator!=(const IPAddress& other) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Operator porównania mniejszości
+	/// \brief Less than comparison operator
 	///
-	/// Porównuje adresy IP leksykograficznie.
+	/// Compares IP addresses lexicographically.
 	///
-	/// \param other Adres IP do porównania
+	/// \param other IP address to compare
 	///
-	/// \return bool true jeśli ten adres jest mniejszy
+	/// \return bool true if this address is less
 	///
 	/// \see operator>(), operator<=(), operator>=()
 	///
@@ -165,13 +165,13 @@ public:
 	bool operator<(const IPAddress& other) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Operator porównania większości
+	/// \brief Greater than comparison operator
 	///
-	/// Porównuje adresy IP leksykograficznie.
+	/// Compares IP addresses lexicographically.
 	///
-	/// \param other Adres IP do porównania
+	/// \param other IP address to compare
 	///
-	/// \return bool true jeśli ten adres jest większy
+	/// \return bool true if this address is greater
 	///
 	/// \see operator<(), operator<=(), operator>=()
 	///
@@ -179,11 +179,11 @@ public:
 	bool operator>(const IPAddress& other) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Operator porównania mniejszości lub równości
+	/// \brief Less than or equal comparison operator
 	///
-	/// \param other Adres IP do porównania
+	/// \param other IP address to compare
 	///
-	/// \return bool true jeśli ten adres jest mniejszy lub równy
+	/// \return bool true if this address is less or equal
 	///
 	/// \see operator<(), operator>(), operator>=()
 	///
@@ -191,11 +191,11 @@ public:
 	bool operator<=(const IPAddress& other) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Operator porównania większości lub równości
+	/// \brief Greater than or equal comparison operator
 	///
-	/// \param other Adres IP do porównania
+	/// \param other IP address to compare
 	///
-	/// \return bool true jeśli ten adres jest większy lub równy
+	/// \return bool true if this address is greater or equal
 	///
 	/// \see operator<(), operator>(), operator<=()
 	///
@@ -203,118 +203,84 @@ public:
 	bool operator>=(const IPAddress& other) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Operator dostępu do bajtu
+	/// \brief Bitwise AND operator
 	///
-	/// Umożliwia dostęp do pojedynczego bajtu adresu IP.
+	/// Performs bitwise AND operation on IP addresses.
+	/// Useful for network mask operations.
 	///
-	/// \param index Indeks bajtu (0-3)
+	/// \param other IP address to AND with
 	///
-	/// \return uint8_t& Referencja do bajtu
+	/// \return IPAddress Result of bitwise AND
 	///
-	/// \see at()
-	///
-	////////////////////////////////////////////////////////////
-	uint8_t& operator[](size_t index);
-
-	////////////////////////////////////////////////////////////
-	/// \brief Operator dostępu do bajtu (const)
-	///
-	/// Umożliwia dostęp do pojedynczego bajtu adresu IP (tylko odczyt).
-	///
-	/// \param index Indeks bajtu (0-3)
-	///
-	/// \return const uint8_t& Referencja do bajtu
-	///
-	/// \see at()
-	///
-	////////////////////////////////////////////////////////////
-	const uint8_t& operator[](size_t index) const;
-
-	////////////////////////////////////////////////////////////
-	/// \brief Operator konwersji na string
-	///
-	/// Konwertuje adres IP na string w formacie kropkowym.
-	///
-	/// \return std::string Adres IP jako string
-	///
-	/// \see toString()
-	///
-	////////////////////////////////////////////////////////////
-	operator std::string() const;
-
-	////////////////////////////////////////////////////////////
-	/// \brief Operator konwersji na vector bajtów
-	///
-	/// Konwertuje adres IP na vector bajtów.
-	///
-	/// \return std::vector<uint8_t> Adres IP jako vector bajtów
-	///
-	/// \see toBytes()
-	///
-	////////////////////////////////////////////////////////////
-	operator std::vector<uint8_t>() const;
-
-	////////////////////////////////////////////////////////////
-	/// \brief Operator bitowego AND
-	///
-	/// Wykonuje operację bitowego AND na adresach IP.
-	/// Użyteczne do obliczania adresów sieci.
-	///
-	/// \param other Adres IP do operacji AND
-	///
-	/// \return IPAddress Wynik operacji AND
-	///
-	/// \see operator|(), operator^()
+	/// \see operator|(), operator~()
 	///
 	////////////////////////////////////////////////////////////
 	IPAddress operator&(const IPAddress& other) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Operator bitowego OR
+	/// \brief Bitwise OR operator
 	///
-	/// Wykonuje operację bitowego OR na adresach IP.
+	/// Performs bitwise OR operation on IP addresses.
+	/// Useful for broadcast address calculations.
 	///
-	/// \param other Adres IP do operacji OR
+	/// \param other IP address to OR with
 	///
-	/// \return IPAddress Wynik operacji OR
+	/// \return IPAddress Result of bitwise OR
 	///
-	/// \see operator&(), operator^()
+	/// \see operator&(), operator~()
 	///
 	////////////////////////////////////////////////////////////
 	IPAddress operator|(const IPAddress& other) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Operator bitowego XOR
+	/// \brief Bitwise NOT operator
 	///
-	/// Wykonuje operację bitowego XOR na adresach IP.
+	/// Performs bitwise NOT operation on IP address.
+	/// Useful for network mask calculations.
 	///
-	/// \param other Adres IP do operacji XOR
-	///
-	/// \return IPAddress Wynik operacji XOR
+	/// \return IPAddress Result of bitwise NOT
 	///
 	/// \see operator&(), operator|()
-	///
-	////////////////////////////////////////////////////////////
-	IPAddress operator^(const IPAddress& other) const;
-
-	////////////////////////////////////////////////////////////
-	/// \brief Operator bitowego NOT
-	///
-	/// Wykonuje operację bitowego NOT na adresie IP.
-	///
-	/// \return IPAddress Wynik operacji NOT
 	///
 	////////////////////////////////////////////////////////////
 	IPAddress operator~() const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Operator przesunięcia w lewo
+	/// \brief Array access operator (non-const)
 	///
-	/// Przesuwa bity adresu IP w lewo.
+	/// Provides access to individual bytes of IP address.
 	///
-	/// \param shift Liczba pozycji do przesunięcia
+	/// \param index Byte index (0-3)
 	///
-	/// \return IPAddress Wynik przesunięcia
+	/// \return uint8_t& Reference to byte at index
+	///
+	/// \see operator[] const
+	///
+	////////////////////////////////////////////////////////////
+	uint8_t& operator[](size_t index);
+
+	////////////////////////////////////////////////////////////
+	/// \brief Array access operator (const)
+	///
+	/// Provides read-only access to individual bytes of IP address.
+	///
+	/// \param index Byte index (0-3)
+	///
+	/// \return const uint8_t& Reference to byte at index
+	///
+	/// \see operator[]
+	///
+	////////////////////////////////////////////////////////////
+	const uint8_t& operator[](size_t index) const;
+
+	////////////////////////////////////////////////////////////
+	/// \brief Left shift operator
+	///
+	/// Shifts IP address bits to the left.
+	///
+	/// \param shift Number of bits to shift
+	///
+	/// \return IPAddress Shifted IP address
 	///
 	/// \see operator>>()
 	///
@@ -322,13 +288,13 @@ public:
 	IPAddress operator<<(int shift) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Operator przesunięcia w prawo
+	/// \brief Right shift operator
 	///
-	/// Przesuwa bity adresu IP w prawo.
+	/// Shifts IP address bits to the right.
 	///
-	/// \param shift Liczba pozycji do przesunięcia
+	/// \param shift Number of bits to shift
 	///
-	/// \return IPAddress Wynik przesunięcia
+	/// \return IPAddress Shifted IP address
 	///
 	/// \see operator<<()
 	///
@@ -336,13 +302,13 @@ public:
 	IPAddress operator>>(int shift) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Operator dodawania
+	/// \brief Addition operator
 	///
-	/// Dodaje liczbę do adresu IP (modulo 2^32).
+	/// Adds integer value to IP address.
 	///
-	/// \param value Liczba do dodania
+	/// \param value Value to add
 	///
-	/// \return IPAddress Wynik dodawania
+	/// \return IPAddress Result of addition
 	///
 	/// \see operator-()
 	///
@@ -350,13 +316,13 @@ public:
 	IPAddress operator+(uint32_t value) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Operator odejmowania
+	/// \brief Subtraction operator
 	///
-	/// Odejmuje liczbę od adresu IP (modulo 2^32).
+	/// Subtracts integer value from IP address.
 	///
-	/// \param value Liczba do odjęcia
+	/// \param value Value to subtract
 	///
-	/// \return IPAddress Wynik odejmowania
+	/// \return IPAddress Result of subtraction
 	///
 	/// \see operator+()
 	///
@@ -364,57 +330,12 @@ public:
 	IPAddress operator-(uint32_t value) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Operator inkrementacji (prefix)
+	/// \brief Checks if IP address is valid
 	///
-	/// Zwiększa adres IP o 1.
+	/// Validates that the IP address contains exactly 4 bytes
+	/// and all values are within valid range (0-255).
 	///
-	/// \return IPAddress& Referencja do tego obiektu
-	///
-	/// \see operator++(int)
-	///
-	////////////////////////////////////////////////////////////
-	IPAddress& operator++();
-
-	////////////////////////////////////////////////////////////
-	/// \brief Operator inkrementacji (postfix)
-	///
-	/// Zwiększa adres IP o 1.
-	///
-	/// \return IPAddress Kopia obiektu przed inkrementacją
-	///
-	/// \see operator++()
-	///
-	////////////////////////////////////////////////////////////
-	IPAddress operator++(int);
-
-	////////////////////////////////////////////////////////////
-	/// \brief Operator dekrementacji (prefix)
-	///
-	/// Zmniejsza adres IP o 1.
-	///
-	/// \return IPAddress& Referencja do tego obiektu
-	///
-	/// \see operator--(int)
-	///
-	////////////////////////////////////////////////////////////
-	IPAddress& operator--();
-
-	////////////////////////////////////////////////////////////
-	/// \brief Operator dekrementacji (postfix)
-	///
-	/// Zmniejsza adres IP o 1.
-	///
-	/// \return IPAddress Kopia obiektu przed dekrementacją
-	///
-	/// \see operator--()
-	///
-	////////////////////////////////////////////////////////////
-	IPAddress operator--(int);
-
-	////////////////////////////////////////////////////////////
-	/// \brief Sprawdza czy adres IP jest poprawny
-	///
-	/// \return bool true jeśli adres IP jest poprawny
+	/// \return bool true if address is valid
 	///
 	/// \see isEmpty()
 	///
@@ -422,9 +343,9 @@ public:
 	bool isValid() const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Sprawdza czy adres IP jest pusty
+	/// \brief Checks if IP address is empty
 	///
-	/// \return bool true jeśli adres IP jest pusty (0.0.0.0)
+	/// \return bool true if address is empty (no bytes)
 	///
 	/// \see isValid()
 	///
@@ -432,9 +353,9 @@ public:
 	bool isEmpty() const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Sprawdza czy adres IP jest lokalny
+	/// \brief Checks if IP address is localhost
 	///
-	/// \return bool true jeśli adres IP jest lokalny (127.x.x.x)
+	/// \return bool true if address is 127.0.0.1
 	///
 	/// \see isPrivate(), isPublic()
 	///
@@ -442,9 +363,12 @@ public:
 	bool isLocalhost() const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Sprawdza czy adres IP jest prywatny
+	/// \brief Checks if IP address is private
 	///
-	/// \return bool true jeśli adres IP jest prywatny
+	/// Checks if address belongs to private network ranges:
+	/// 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
+	///
+	/// \return bool true if address is private
 	///
 	/// \see isLocalhost(), isPublic()
 	///
@@ -452,9 +376,9 @@ public:
 	bool isPrivate() const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Sprawdza czy adres IP jest publiczny
+	/// \brief Checks if IP address is public
 	///
-	/// \return bool true jeśli adres IP jest publiczny
+	/// \return bool true if address is public (not private or localhost)
 	///
 	/// \see isLocalhost(), isPrivate()
 	///
@@ -462,20 +386,20 @@ public:
 	bool isPublic() const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Sprawdza czy adres IP jest w tej samej sieci
+	/// \brief Checks if IP address is in same network
 	///
-	/// \param other Adres IP do sprawdzenia
-	/// \param mask Maska sieci
+	/// \param other Other IP address to check
+	/// \param mask Network mask
 	///
-	/// \return bool true jeśli adresy są w tej samej sieci
+	/// \return bool true if addresses are in same network
 	///
 	////////////////////////////////////////////////////////////
 	bool isInSameNetwork(const IPAddress& other, const IPAddress& mask) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Konwertuje adres IP na string
+	/// \brief Converts IP address to string
 	///
-	/// \return std::string Adres IP w formacie kropkowym
+	/// \return std::string IP address in "192.168.1.1" format
 	///
 	/// \see fromString()
 	///
@@ -483,9 +407,9 @@ public:
 	std::string toString() const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Konwertuje adres IP na vector bajtów
+	/// \brief Converts IP address to byte vector
 	///
-	/// \return std::vector<uint8_t> Adres IP jako vector bajtów
+	/// \return std::vector<uint8_t> Vector of 4 bytes
 	///
 	/// \see fromBytes()
 	///
@@ -493,9 +417,9 @@ public:
 	std::vector<uint8_t> toBytes() const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Konwertuje adres IP na uint32_t
+	/// \brief Converts IP address to 32-bit integer
 	///
-	/// \return uint32_t Adres IP jako liczba 32-bitowa
+	/// \return uint32_t 32-bit representation of IP address
 	///
 	/// \see fromUint32()
 	///
@@ -503,11 +427,13 @@ public:
 	uint32_t toUint32() const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Tworzy adres IP ze stringa
+	/// \brief Creates IP address from string
 	///
-	/// \param ipString Adres IP w formacie kropkowym
+	/// Static factory method to create IP address from string.
 	///
-	/// \return IPAddress Adres IP lub pusty adres jeśli błąd
+	/// \param ipString IP address string
+	///
+	/// \return IPAddress IP address object
 	///
 	/// \see toString()
 	///
@@ -515,11 +441,13 @@ public:
 	static IPAddress fromString(const std::string& ipString);
 
 	////////////////////////////////////////////////////////////
-	/// \brief Tworzy adres IP z vectora bajtów
+	/// \brief Creates IP address from byte vector
 	///
-	/// \param bytes Vector bajtów (musi mieć 4 elementy)
+	/// Static factory method to create IP address from byte vector.
 	///
-	/// \return IPAddress Adres IP lub pusty adres jeśli błąd
+	/// \param bytes Byte vector (must have 4 elements)
+	///
+	/// \return IPAddress IP address object
 	///
 	/// \see toBytes()
 	///
@@ -527,11 +455,13 @@ public:
 	static IPAddress fromBytes(const std::vector<uint8_t>& bytes);
 
 	////////////////////////////////////////////////////////////
-	/// \brief Tworzy adres IP z uint32_t
+	/// \brief Creates IP address from 32-bit integer
 	///
-	/// \param value Liczba 32-bitowa reprezentująca adres IP
+	/// Static factory method to create IP address from 32-bit integer.
 	///
-	/// \return IPAddress Adres IP
+	/// \param value 32-bit integer value
+	///
+	/// \return IPAddress IP address object
 	///
 	/// \see toUint32()
 	///
@@ -539,134 +469,154 @@ public:
 	static IPAddress fromUint32(uint32_t value);
 
 	////////////////////////////////////////////////////////////
-	/// \brief Tworzy maskę sieci z długości prefiksu
+	/// \brief Creates network mask from prefix length
 	///
-	/// \param prefixLength Długość prefiksu (0-32)
+	/// Creates network mask from CIDR prefix length.
 	///
-	/// \return IPAddress Maska sieci
+	/// \param prefixLength Prefix length (0-32)
+	///
+	/// \return IPAddress Network mask
 	///
 	////////////////////////////////////////////////////////////
 	static IPAddress fromPrefixLength(uint8_t prefixLength);
 
 	////////////////////////////////////////////////////////////
-	/// \brief Pobiera adres sieci
+	/// \brief Gets network address
 	///
-	/// \param mask Maska sieci
+	/// Calculates network address using given mask.
 	///
-	/// \return IPAddress Adres sieci
+	/// \param mask Network mask
+	///
+	/// \return IPAddress Network address
+	///
+	/// \see getBroadcastAddress()
 	///
 	////////////////////////////////////////////////////////////
 	IPAddress getNetworkAddress(const IPAddress& mask) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Pobiera adres broadcast
+	/// \brief Gets broadcast address
 	///
-	/// \param mask Maska sieci
+	/// Calculates broadcast address using given mask.
 	///
-	/// \return IPAddress Adres broadcast
+	/// \param mask Network mask
+	///
+	/// \return IPAddress Broadcast address
+	///
+	/// \see getNetworkAddress()
 	///
 	////////////////////////////////////////////////////////////
 	IPAddress getBroadcastAddress(const IPAddress& mask) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Pobiera pierwszy adres hosta
+	/// \brief Gets first host address
 	///
-	/// \param mask Maska sieci
+	/// Calculates first usable host address in network.
 	///
-	/// \return IPAddress Pierwszy adres hosta
+	/// \param mask Network mask
+	///
+	/// \return IPAddress First host address
+	///
+	/// \see getLastHostAddress()
 	///
 	////////////////////////////////////////////////////////////
 	IPAddress getFirstHostAddress(const IPAddress& mask) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Pobiera ostatni adres hosta
+	/// \brief Gets last host address
 	///
-	/// \param mask Maska sieci
+	/// Calculates last usable host address in network.
 	///
-	/// \return IPAddress Ostatni adres hosta
+	/// \param mask Network mask
+	///
+	/// \return IPAddress Last host address
+	///
+	/// \see getFirstHostAddress()
 	///
 	////////////////////////////////////////////////////////////
 	IPAddress getLastHostAddress(const IPAddress& mask) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Pobiera liczbę hostów w sieci
+	/// \brief Gets number of hosts in network
 	///
-	/// \param mask Maska sieci
+	/// Calculates number of usable host addresses in network.
 	///
-	/// \return uint32_t Liczba hostów w sieci
+	/// \param mask Network mask
+	///
+	/// \return uint32_t Number of hosts
+	///
+	/// \see getFirstHostAddress(), getLastHostAddress()
 	///
 	////////////////////////////////////////////////////////////
 	uint32_t getHostCount(const IPAddress& mask) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Bezpieczny dostęp do bajtu
+	/// \brief Gets byte at specified index
 	///
-	/// \param index Indeks bajtu (0-3)
+	/// Safe access to individual bytes with bounds checking.
 	///
-	/// \return uint8_t Bajt adresu IP
+	/// \param index Byte index (0-3)
 	///
-	/// \throws std::out_of_range jeśli indeks jest nieprawidłowy
+	/// \return uint8_t Byte value at index
 	///
-	/// \see operator[]()
+	/// \see operator[]
 	///
 	////////////////////////////////////////////////////////////
 	uint8_t at(size_t index) const;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Pobiera rozmiar adresu IP
+	/// \brief Gets size of IP address
 	///
-	/// \return size_t Rozmiar adresu IP (zawsze 4)
+	/// \return size_t Always returns 4
 	///
 	////////////////////////////////////////////////////////////
 	size_t size() const { return 4; }
 
 	////////////////////////////////////////////////////////////
-	/// \brief Sprawdza czy adres IP jest pusty
+	/// \brief Checks if IP address is empty
 	///
-	/// \return bool true jeśli adres IP jest pusty
+	/// \return bool true if address has no bytes
+	///
+	/// \see isEmpty()
 	///
 	////////////////////////////////////////////////////////////
 	bool empty() const { return address.empty(); }
 
 	////////////////////////////////////////////////////////////
-	/// \brief Pobiera wskaźnik do danych
+	/// \brief Gets iterator to beginning
 	///
-	/// \return const uint8_t* Wskaźnik do danych adresu IP
+	/// \return std::vector<uint8_t>::const_iterator Iterator to first byte
 	///
-	////////////////////////////////////////////////////////////
-	const uint8_t* data() const { return address.data(); }
-
-	////////////////////////////////////////////////////////////
-	/// \brief Pobiera iterator na początek
-	///
-	/// \return std::vector<uint8_t>::const_iterator Iterator na początek
+	/// \see end()
 	///
 	////////////////////////////////////////////////////////////
 	std::vector<uint8_t>::const_iterator begin() const { return address.begin(); }
 
 	////////////////////////////////////////////////////////////
-	/// \brief Pobiera iterator na koniec
+	/// \brief Gets iterator to end
 	///
-	/// \return std::vector<uint8_t>::const_iterator Iterator na koniec
+	/// \return std::vector<uint8_t>::const_iterator Iterator past last byte
+	///
+	/// \see begin()
 	///
 	////////////////////////////////////////////////////////////
 	std::vector<uint8_t>::const_iterator end() const { return address.end(); }
 
-	// Predefiniowane adresy IP
-	static const IPAddress Any;        ///< 0.0.0.0 - dowolny adres
+	// Predefined addresses
+	static const IPAddress Any;        ///< 0.0.0.0 - any address
 	static const IPAddress Localhost;  ///< 127.0.0.1 - localhost
 	static const IPAddress Broadcast;  ///< 255.255.255.255 - broadcast
 };
 
 ////////////////////////////////////////////////////////////
-/// \brief Operator wyjścia dla IPAddress
+/// \brief Output operator for IPAddress
 ///
-/// Wyświetla adres IP w formacie kropkowym.
+/// Displays IP address in dotted format.
 ///
-/// \param os Strumień wyjścia
-/// \param ip Adres IP do wyświetlenia
+/// \param os Output stream
+/// \param ip IP address to display
 ///
-/// \return std::ostream& Referencja do strumienia
+/// \return std::ostream& Reference to stream
 ///
 /// \see operator>>()
 ///
@@ -674,14 +624,14 @@ public:
 std::ostream& operator<<(std::ostream& os, const IPAddress& ip);
 
 ////////////////////////////////////////////////////////////
-/// \brief Operator wejścia dla IPAddress
+/// \brief Input operator for IPAddress
 ///
-/// Wczytuje adres IP ze strumienia w formacie kropkowym.
+/// Reads IP address from stream in dotted format.
 ///
-/// \param is Strumień wejścia
-/// \param ip Adres IP do wczytania
+/// \param is Input stream
+/// \param ip IP address to read
 ///
-/// \return std::istream& Referencja do strumienia
+/// \return std::istream& Reference to stream
 ///
 /// \see operator<<()
 ///

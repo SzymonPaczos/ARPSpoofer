@@ -9,15 +9,15 @@
 #endif
 
 ////////////////////////////////////////////////////////////
-/// \brief Obsługa sygnału przerwania (Ctrl+C)
+/// \brief Interrupt signal handler (Ctrl+C)
 ///
-/// Funkcja ta jest wywoływana przez system gdy użytkownik
-/// naciśnie Ctrl+C w konsoli. Bezpiecznie zatrzymuje
-/// główną aplikację.
+/// This function is called by the system when the user
+/// presses Ctrl+C in the console. Safely stops the
+/// main application.
 ///
-/// \param dwCtrlType Typ sygnału kontrolnego
+/// \param dwCtrlType Control signal type
 ///
-/// \return BOOL TRUE jeśli sygnał został obsłużony
+/// \return BOOL TRUE if signal was handled
 ///
 ////////////////////////////////////////////////////////////
 #ifdef _WIN32
@@ -31,53 +31,53 @@ BOOL WINAPI CtrlCHandler(DWORD dwCtrlType) {
 #endif
 
 ////////////////////////////////////////////////////////////
-/// \brief Wyświetla pomoc programu
+/// \brief Displays program help
 ///
-/// Funkcja ta wyświetla szczegółową pomoc dotyczącą
-/// używania programu w nowoczesnym formacie.
+/// This function displays detailed help about
+/// using the program in modern format.
 ///
-/// \param programName Nazwa programu
+/// \param programName Program name
 ///
 ////////////////////////////////////////////////////////////
 void showHelp(const std::string& programName) {
-	std::cout << "ARP Spoofing Tool - Nowoczesna wersja C++\n";
-	std::cout << "==========================================\n\n";
-	std::cout << "Użycie: " << programName << " [OPCJE] <victim-ip> [target-ip]\n\n";
-	std::cout << "Opcje:\n";
-	std::cout << "  --help, -h          Wyświetla tę pomoc\n";
-	std::cout << "  --list, -l          Wyświetla listę interfejsów sieciowych\n";
-	std::cout << "  --interface, -i     Określa interfejs sieciowy\n";
-	std::cout << "  --oneway, -o        Tylko jednokierunkowy atak\n";
-	std::cout << "  --interval, -t      Interwał pakietów ARP (sekundy, domyślnie 2)\n";
-	std::cout << "  --verbose, -v       Szczegółowe logowanie\n\n";
-	std::cout << "Argumenty:\n";
-	std::cout << "  victim-ip           Adres IP ofiary (wymagany)\n";
-	std::cout << "  target-ip           Adres IP celu (opcjonalny, domyślnie brama)\n\n";
-	std::cout << "Przykłady:\n";
+	std::cout << "ARP Spoofing Tool - C++\n";
+	std::cout << "========================\n\n";
+	std::cout << "Usage: " << programName << " [OPTIONS] <victim-ip> [target-ip]\n\n";
+	std::cout << "Options:\n";
+	std::cout << "  --help, -h          Display this help\n";
+	std::cout << "  --list, -l          Display list of network interfaces\n";
+	std::cout << "  --interface, -i     Specify network interface\n";
+	std::cout << "  --oneway, -o        One-way attack only\n";
+	std::cout << "  --interval, -t      ARP packet interval (seconds, default 2)\n";
+	std::cout << "  --verbose, -v       Detailed logging\n\n";
+	std::cout << "Arguments:\n";
+	std::cout << "  victim-ip           Victim's IP address (required)\n";
+	std::cout << "  target-ip           Target's IP address (optional, default gateway)\n\n";
+	std::cout << "Examples:\n";
 	std::cout << "  " << programName << " --list\n";
 	std::cout << "  " << programName << " 192.168.1.10\n";
 	std::cout << "  " << programName << " -i eth0 192.168.1.10\n";
 	std::cout << "  " << programName << " --oneway 192.168.1.10\n";
 	std::cout << "  " << programName << " -t 5 192.168.1.10 192.168.1.1\n\n";
-	std::cout << "UWAGA: Program wymaga uprawnień administratora!\n";
-	std::cout << "       Używaj tylko w kontrolowanym środowisku.\n";
+	std::cout << "WARNING: Program requires administrator privileges!\n";
+	std::cout << "         Use only in controlled environment.\n";
 }
 
 ////////////////////////////////////////////////////////////
-/// \brief Parsuje argumenty wiersza poleceń
+/// \brief Parses command line arguments
 ///
-/// Funkcja ta analizuje argumenty i zwraca skonfigurowany
-/// obiekt AttackConfig.
+/// This function analyzes arguments and returns configured
+/// AttackConfig object.
 ///
-/// \param argc Liczba argumentów
-/// \param argv Tablica argumentów
-/// \param config Referencja do konfiguracji do wypełnienia
+/// \param argc Number of arguments
+/// \param argv Array of arguments
+/// \param config Reference to configuration to fill
 ///
-/// \return bool true jeśli parsowanie się powiodło
+/// \return bool true if parsing succeeded
 ///
 ////////////////////////////////////////////////////////////
 bool parseArguments(int argc, char* argv[], App::AttackConfig& config) {
-	// Domyślne wartości
+	// Default values
 	config.oneWayMode = false;
 	config.arpInterval = 2;
 	
@@ -100,15 +100,15 @@ bool parseArguments(int argc, char* argv[], App::AttackConfig& config) {
 				try {
 					config.arpInterval = std::stoi(argv[++i]);
 					if (config.arpInterval <= 0) {
-						std::cerr << "Błąd: Interwał musi być większy od 0\n";
+						std::cerr << "Error: Interval must be greater than 0\n";
 						return false;
 					}
 				} catch (const std::exception&) {
-					std::cerr << "Błąd: Nieprawidłowy interwał\n";
+					std::cerr << "Error: Invalid interval\n";
 					return false;
 				}
 			} else {
-				std::cerr << "Błąd: Brak wartości dla --interval\n";
+				std::cerr << "Error: Missing value for --interval\n";
 				return false;
 			}
 		}
@@ -116,18 +116,18 @@ bool parseArguments(int argc, char* argv[], App::AttackConfig& config) {
 			if (i + 1 < argc) {
 				config.interfaceName = argv[++i];
 			} else {
-				std::cerr << "Błąd: Brak nazwy interfejsu\n";
+				std::cerr << "Error: Missing interface name\n";
 				return false;
 			}
 		}
 		else if (arg == "--verbose" || arg == "-v") {
-			// TODO: Implementacja verbose mode
+			// TODO: Implement verbose mode
 		}
 		else if (arg[0] != '-') {
-			// To jest adres IP
+			// This is an IP address
 			IPAddress ipAddr = IPAddress::fromString(arg);
 			if (ipAddr.isEmpty()) {
-				std::cerr << "Błąd: Nieprawidłowy adres IP: " << arg << "\n";
+				std::cerr << "Error: Invalid IP address: " << arg << "\n";
 				return false;
 			}
 			
@@ -136,18 +136,18 @@ bool parseArguments(int argc, char* argv[], App::AttackConfig& config) {
 			} else if (config.targetIp.isEmpty()) {
 				config.targetIp = ipAddr;
 			} else {
-				std::cerr << "Błąd: Zbyt wiele argumentów\n";
+				std::cerr << "Error: Too many arguments\n";
 				return false;
 			}
 		}
 		else {
-			std::cerr << "Błąd: Nieznana opcja: " << arg << "\n";
+			std::cerr << "Error: Unknown option: " << arg << "\n";
 			return false;
 		}
 	}
 	
 	if (config.victimIp.isEmpty()) {
-		std::cerr << "Błąd: Adres IP ofiary jest wymagany\n";
+		std::cerr << "Error: Victim IP address is required\n";
 		return false;
 	}
 	
@@ -155,13 +155,13 @@ bool parseArguments(int argc, char* argv[], App::AttackConfig& config) {
 }
 
 ////////////////////////////////////////////////////////////
-/// \brief Callback dla logowania
+/// \brief Logging callback
 ///
-/// Funkcja callback używana przez aplikację do logowania
-/// zdarzeń w konsoli.
+/// Callback function used by application to log
+/// events to console.
 ///
-/// \param level Poziom logowania
-/// \param message Wiadomość do zalogowania
+/// \param level Log level
+/// \param message Message to log
 ///
 ////////////////////////////////////////////////////////////
 void logCallback(int level, const std::string& message) {
@@ -176,62 +176,73 @@ void logCallback(int level, const std::string& message) {
 }
 
 ////////////////////////////////////////////////////////////
-/// \brief Callback dla zatrzymania
+/// \brief Stop callback
 ///
-/// Funkcja callback wywoływana gdy atak zostaje zatrzymany.
+/// Callback function called when attack is stopped.
 ///
 ////////////////////////////////////////////////////////////
 void stopCallback() {
-	std::cout << "\nAtak został zatrzymany.\n";
+	std::cout << "\nAttack has been stopped.\n";
 }
 
 ////////////////////////////////////////////////////////////
-/// \brief Główna funkcja programu
+/// \brief Main program function
 ///
-/// Funkcja main() jest punktem wejścia do nowoczesnej
-/// wersji aplikacji ARP spoofing. Używa nowoczesnych
-/// funkcji C++ i wzorca Singleton.
+/// The main() function is the entry point to the modern
+/// ARP spoofing application. Uses modern C++ features
+/// and Singleton pattern.
 ///
-/// \param argc Liczba argumentów
-/// \param argv Tablica argumentów
+/// \param argc Number of arguments
+/// \param argv Array of arguments
 ///
-/// \return int Kod wyjścia
+/// \return int Exit code
 ///
 ////////////////////////////////////////////////////////////
 int main(int argc, char* argv[]) {
-	// Sprawdź argumenty
+	// Check arguments
 	if (argc < 2) {
 		showHelp(argv[0]);
 		return 1;
 	}
-	
-	// Parsuj argumenty
+
+	// Handle --help option
+	if (argc == 2 && (std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h")) {
+		showHelp(argv[0]);
+		return 0;
+	}
+
+	// Parse arguments
 	App::AttackConfig config;
 	if (!parseArguments(argc, argv, config)) {
 		return 1;
 	}
-	
-	// Pobierz instancję aplikacji
+
+	// Get application instance
 	App& app = App::getInstance();
-	
-	// Ustaw callbacks
+
+	// Set up callbacks
 	app.setLogCallback(logCallback);
 	app.setStopCallback(stopCallback);
-	
-	// Zarejestruj obsługę sygnału Ctrl+C
+
+	// Register Ctrl+C handler
 #ifdef _WIN32
 	SetConsoleCtrlHandler(CtrlCHandler, TRUE);
 #endif
-	
-	// Skonfiguruj atak
+
+	// Configure attack
 	if (!app.configureAttack(config)) {
+		std::cerr << "Error: Failed to configure attack\n";
 		return 1;
 	}
-	
-	// Rozpocznij atak
+
+	// Start attack
+	std::cout << "Starting ARP spoofing attack...\n";
+	std::cout << "Press Ctrl+C to stop\n\n";
+
 	if (!app.startAttack()) {
+		std::cerr << "Error: Attack failed\n";
 		return 1;
 	}
-	
+
 	return 0;
 } 

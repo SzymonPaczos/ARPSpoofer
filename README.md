@@ -1,200 +1,200 @@
 # ARP Spoofing Tool - C++
 
-Nowoczesna implementacja narzędzia ARP spoofing napisana w C++17, wykorzystująca inteligentne wskaźniki, atomiki, callbacki i wzorce projektowe. Program jest wieloplatformowy i nie wymaga zewnętrznych zależności.
+Modern implementation of ARP spoofing tool written in C++17, using smart pointers, atomics, callbacks and design patterns. The program is cross-platform and requires no external dependencies.
 
-## 🎯 **Pojęcia kluczowe**
+## 🎯 **Key Concepts**
 
-### **Ofiara (Victim)**
-- To host, który **nie wie** że jest atakowany
-- Jego ruch sieciowy jest przechwytywany i przekierowywany
-- Myśli, że komunikuje się bezpośrednio z celem
-- Przykład: komputer użytkownika w sieci
+### **Victim**
+- This is a host that **does not know** it is being attacked
+- Its network traffic is intercepted and redirected
+- It thinks it is communicating directly with the target
+- Example: user's computer on the network
 
-### **Cel (Target)**
-- To host, z którym ofiara próbuje się komunikować
-- Może być bramą domyślną, serwerem, innym komputerem
-- Przykład: router, serwer internetowy, inny komputer w sieci
+### **Target**
+- This is a host that the victim is trying to communicate with
+- Can be a default gateway, server, or another computer
+- Example: router, internet server, another computer on the network
 
-### **Tryb jednokierunkowy (One-way mode)**
-- **Normalny tryb:** Oszukujemy zarówno ofiarę jak i cel
-  - Ofiara myśli, że nasz komputer to cel
-  - Cel myśli, że nasz komputer to ofiara
-  - Przechwytujemy ruch w obu kierunkach
+### **One-way Mode**
+- **Normal mode:** We spoof both victim and target
+  - Victim thinks our computer is the target
+  - Target thinks our computer is the victim
+  - We intercept traffic in both directions
 
-- **Tryb jednokierunkowy:** Oszukujemy tylko ofiarę
-  - Ofiara myśli, że nasz komputer to cel
-  - Cel nie jest oszukiwany
-  - Przechwytujemy tylko ruch od ofiary do celu
-  - Ruch od celu do ofiary idzie normalnie
+- **One-way mode:** We only spoof the victim
+  - Victim thinks our computer is the target
+  - Target is not spoofed
+  - We only intercept traffic from victim to target
+  - Traffic from target to victim goes normally
 
-## 🏗️ **Architektura**
+## 🏗️ **Architecture**
 
-Program wykorzystuje nowoczesne wzorce projektowe:
+The program uses modern design patterns:
 
-### **Wzorzec Singleton (App)**
-- Centralny punkt aplikacji
-- Zarządza cyklem życia ataku
-- Koordynuje wszystkie komponenty
+### **Singleton Pattern (App)**
+- Central application point
+- Manages attack lifecycle
+- Coordinates all components
 
-### **Fabryka Abstrakcji (PlatformFactory)**
-- Tworzy platformowo-zależne komponenty
-- Umożliwia łatwe rozszerzenie na inne systemy
-- Enkapsuluje różnice między platformami
+### **Abstraction Factory (PlatformFactory)**
+- Creates platform-dependent components
+- Enables easy extension to other systems
+- Encapsulates differences between platforms
 
-### **Klasa IPAddress**
-Nowoczesna klasa do obsługi adresów IPv4 w stylu SFML:
+### **IPAddress Class**
+Modern class for IPv4 address handling in SFML style:
 
 ```cpp
-// Tworzenie adresów IP
+// Creating IP addresses
 IPAddress ip1("192.168.1.1");
 IPAddress ip2(192, 168, 1, 1);
 IPAddress ip3 = IPAddress::fromString("192.168.1.1");
 
-// Operacje na adresach
+// Operations on addresses
 if (ip1 == ip2) { /* ... */ }
 if (ip1 < ip2) { /* ... */ }
 IPAddress network = ip1 & mask;
 IPAddress broadcast = ip1 | ~mask;
 
-// Sprawdzanie typów adresów
+// Checking address types
 if (ip1.isPrivate()) { /* ... */ }
 if (ip1.isLocalhost()) { /* ... */ }
 if (ip1.isPublic()) { /* ... */ }
 
-// Konwersje
+// Conversions
 std::string str = ip1.toString();
 uint32_t num = ip1.toUint32();
 std::vector<uint8_t> bytes = ip1.toBytes();
 
-// Predefiniowane adresy
+// Predefined addresses
 IPAddress::Any        // 0.0.0.0
 IPAddress::Localhost  // 127.0.0.1
 IPAddress::Broadcast  // 255.255.255.255
 ```
 
-## 📁 **Struktura plików**
+## 📁 **File Structure**
 
 ```
 arpspoof/
-├── App.hpp/cpp                    # Główna klasa aplikacji (Singleton)
-├── IPAddress.hpp/cpp              # Klasa do obsługi adresów IPv4
-├── ArpSpoofer.hpp/cpp             # Klasa do wykonywania ataków ARP
-├── PlatformAbstraction.hpp        # Abstrakcje platformowe
-├── WindowsPlatform.hpp/cpp        # Implementacja Windows
-├── PlatformFactory.cpp            # Fabryka komponentów
-├── NetworkHeaders.hpp             # Definicje nagłówków sieciowych
-├── main.cpp                       # Główny plik wykonywalny
-├── arpspoof.vcxproj               # Projekt Visual Studio
-└── README.md                      # Ten plik
+├── App.hpp/cpp                    # Main application class (Singleton)
+├── IPAddress.hpp/cpp              # IPv4 address handling class
+├── ArpSpoofer.hpp/cpp             # ARP attack execution class
+├── PlatformAbstraction.hpp        # Platform abstractions
+├── WindowsPlatform.hpp/cpp        # Windows implementation
+├── PlatformFactory.cpp            # Component factory
+├── NetworkHeaders.hpp             # Network header definitions
+├── main.cpp                       # Main executable file
+├── arpspoof.vcxproj               # Visual Studio project
+└── README.md                      # This file
 ```
 
-## 🚀 **Kompilacja**
+## 🚀 **Compilation**
 
-### **Wymagania**
-- Visual Studio 2019/2022 z C++17
+### **Requirements**
+- Visual Studio 2019/2022 with C++17
 - Windows 10/11
-- Uprawnienia administratora
+- Administrator privileges
 
-### **Kompilacja**
-1. Otwórz `arpspoof.vcxproj` w Visual Studio
-2. Wybierz konfigurację Release x64
-3. Skompiluj projekt (Ctrl+Shift+B)
+### **Compilation**
+1. Open `arpspoof.vcxproj` in Visual Studio
+2. Select Release x64 configuration
+3. Compile project (Ctrl+Shift+B)
 
-## 📖 **Użycie**
+## 📖 **Usage**
 
-### **Podstawowa składnia**
+### **Basic Syntax**
 ```bash
-arpspoof.exe [OPCJE] <victim-ip> [target-ip]
+arpspoof.exe [OPTIONS] <victim-ip> [target-ip]
 ```
 
-### **Opcje**
-- `--help, -h` - Wyświetla pomoc
-- `--list, -l` - Lista interfejsów sieciowych
-- `--interface, -i` - Określa interfejs sieciowy
-- `--oneway, -o` - Tryb jednokierunkowy
-- `--interval, -t` - Interwał pakietów ARP (sekundy)
-- `--verbose, -v` - Szczegółowe logowanie
+### **Options**
+- `--help, -h` - Display help
+- `--list, -l` - List network interfaces
+- `--interface, -i` - Specify network interface
+- `--oneway, -o` - One-way mode
+- `--interval, -t` - ARP packet interval (seconds)
+- `--verbose, -v` - Detailed logging
 
-### **Przykłady**
+### **Examples**
 
-**Lista interfejsów:**
+**List interfaces:**
 ```bash
 arpspoof.exe --list
 ```
 
-**Podstawowy atak (ofiara -> brama):**
+**Basic attack (victim -> gateway):**
 ```bash
 arpspoof.exe 192.168.1.10
 ```
 
-**Atak z określonym celem:**
+**Attack with specific target:**
 ```bash
 arpspoof.exe 192.168.1.10 192.168.1.1
 ```
 
-**Tryb jednokierunkowy:**
+**One-way mode:**
 ```bash
 arpspoof.exe --oneway 192.168.1.10
 ```
 
-**Określony interfejs i interwał:**
+**Specified interface and interval:**
 ```bash
 arpspoof.exe -i "Ethernet" -t 5 192.168.1.10
 ```
 
-## 🔧 **Funkcje**
+## 🔧 **Features**
 
-### **Automatyczne wykrywanie interfejsów**
-Program automatycznie wykrywa odpowiedni interfejs sieciowy na podstawie adresu IP ofiary.
+### **Automatic Interface Detection**
+The program automatically detects the appropriate network interface based on the victim's IP address.
 
-### **Rozstrzyganie adresów MAC**
-Automatyczne rozstrzyganie adresów MAC za pomocą pakietów ARP request.
+### **MAC Address Resolution**
+Automatic MAC address resolution using ARP request packets.
 
-### **Przechwytywanie ruchu**
-Program przechwytuje ruch sieciowy między ofiarą a celem i przekazuje go dalej.
+### **Traffic Interception**
+The program intercepts network traffic between victim and target and forwards it.
 
-### **Bezpieczne zatrzymanie**
-Po naciśnięciu Ctrl+C program wysyła prawidłowe pakiety ARP aby przywrócić normalne działanie sieci.
+### **Safe Stop**
+After pressing Ctrl+C, the program sends correct ARP packets to restore normal network operation.
 
-## ⚠️ **Ostrzeżenia**
+## ⚠️ **Warnings**
 
-- **Program wymaga uprawnień administratora!**
-- Używaj tylko w kontrolowanym środowisku
-- ARP spoofing może zakłócić działanie sieci
-- Nie używaj do nieautoryzowanego przechwytywania ruchu
+- **Program requires administrator privileges!**
+- Use only in controlled environment
+- ARP spoofing can disrupt network operation
+- Do not use for unauthorized traffic interception
 
-## 🛡️ **Bezpieczeństwo**
+## 🛡️ **Security**
 
-Program implementuje następujące środki bezpieczeństwa:
+The program implements the following security measures:
 
-- Walidacja adresów IP
-- Sprawdzanie uprawnień
-- Bezpieczne zarządzanie pamięcią (RAII)
-- Obsługa błędów i wyjątków
-- Bezpieczne zatrzymanie ataku
+- IP address validation
+- Permission checking
+- Safe memory management (RAII)
+- Error handling and exceptions
+- Safe attack termination
 
-## 🔮 **Rozszerzenia**
+## 🔮 **Extensions**
 
-Program jest zaprojektowany do łatwego rozszerzania:
+The program is designed for easy extension:
 
-- **Nowe platformy:** Dodaj implementację w `PlatformAbstraction.hpp`
-- **Nowe protokoły:** Rozszerz `NetworkHeaders.hpp`
-- **Nowe funkcje:** Dodaj metody do klasy `App`
-- **GUI:** Można dodać interfejs graficzny używając callbacków
+- **New platforms:** Add implementation in `PlatformAbstraction.hpp`
+- **New protocols:** Extend `NetworkHeaders.hpp`
+- **New features:** Add methods to `App` class
+- **GUI:** Can add graphical interface using callbacks
 
-## 📝 **Licencja**
+## 📝 **License**
 
-Ten projekt jest przeznaczony wyłącznie do celów edukacyjnych i testowania bezpieczeństwa w kontrolowanym środowisku.
+This project is intended for educational purposes and security testing in controlled environments only.
 
-## 🤝 **Wkład**
+## 🤝 **Contributing**
 
-Projekt jest otwarty na wkład społeczności. Proszę o:
+The project is open to community contributions. Please:
 
-- Zgłaszanie błędów
-- Propozycje nowych funkcji
-- Poprawki kodu
-- Dokumentację
+- Report bugs
+- Suggest new features
+- Code improvements
+- Documentation
 
 ---
 
-**Uwaga:** Używaj tego narzędzia odpowiedzialnie i tylko w środowiskach, które kontrolujesz lub masz uprawnienia do testowania. 
+**Note:** Use this tool responsibly and only in environments you control or have permission to test. 

@@ -5,17 +5,17 @@
 #ifdef _WIN32
 
 ////////////////////////////////////////////////////////////
-/// \brief Implementacja NetworkInterface dla Windows
+/// \brief Windows implementation of NetworkInterface
 ///
-/// Klasa ta implementuje interfejs NetworkInterface
-/// używając Windows API (GetAdaptersAddresses, ResolveIpNetEntry2).
-/// Zapewnia dostęp do informacji o interfejsach sieciowych
-/// oraz rozstrzyganie adresów MAC na platformie Windows.
+/// This class implements the NetworkInterface interface
+/// using Windows API (GetAdaptersAddresses, ResolveIpNetEntry2).
+/// Provides access to network interface information
+/// and MAC address resolution on Windows platform.
 ///
-/// Nazwa klasy "WindowsNetworkInterface" pochodzi od:
-/// - "Windows" - oznacza platformę Windows
-/// - "Network" - oznacza operacje sieciowe
-/// - "Interface" - oznacza implementację interfejsu
+/// The class name "WindowsNetworkInterface" comes from:
+/// - "Windows" - denotes Windows platform
+/// - "Network" - denotes network operations
+/// - "Interface" - denotes interface implementation
 ///
 /// \see NetworkInterface, PlatformFactory
 ///
@@ -23,28 +23,28 @@
 class WindowsNetworkInterface : public NetworkInterface {
 public:
 	////////////////////////////////////////////////////////////
-	/// \brief Konstruktor domyślny
+	/// \brief Default constructor
 	///
-	/// Inicjalizuje obiekt WindowsNetworkInterface.
+	/// Initializes WindowsNetworkInterface object.
 	///
 	////////////////////////////////////////////////////////////
 	WindowsNetworkInterface() = default;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Destruktor
+	/// \brief Destructor
 	///
-	/// Zwalnia zasoby związane z Windows API.
+	/// Releases Windows API resources.
 	///
 	////////////////////////////////////////////////////////////
 	~WindowsNetworkInterface() override = default;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Pobiera listę wszystkich interfejsów sieciowych
+	/// \brief Gets list of all network interfaces
 	///
-	/// Implementacja dla Windows używająca GetAdaptersAddresses()
-	/// do pobrania informacji o wszystkich adapterach sieciowych.
+	/// Windows implementation using GetAdaptersAddresses()
+	/// to retrieve information about all network adapters.
 	///
-	/// \return std::vector<InterfaceInfo> Lista interfejsów sieciowych
+	/// \return std::vector<InterfaceInfo> List of network interfaces
 	///
 	/// \see NetworkInterface::getInterfaces()
 	///
@@ -52,15 +52,15 @@ public:
 	std::vector<InterfaceInfo> getInterfaces() override;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Rozwiązuje adres IP na adres MAC
+	/// \brief Resolves IP address to MAC address
 	///
-	/// Implementacja dla Windows używająca ResolveIpNetEntry2()
-	/// do wyszukania adresu MAC w tablicy ARP systemu.
+	/// Windows implementation using ResolveIpNetEntry2()
+	/// to search for MAC address in system ARP table.
 	///
-	/// \param interfaceName Nazwa interfejsu na którym szukać
-	/// \param ip Adres IP do rozstrzygnięcia
+	/// \param interfaceName Interface name to search on
+	/// \param ip IP address to resolve
 	///
-	/// \return std::vector<uint8_t> Adres MAC (6 bajtów) lub pusty vector
+	/// \return std::vector<uint8_t> MAC address (6 bytes) or empty vector
 	///
 	/// \see NetworkInterface::resolveMacAddress()
 	///
@@ -70,31 +70,31 @@ public:
 
 private:
 	////////////////////////////////////////////////////////////
-	/// \brief Konwertuje ciąg Unicode na string
+	/// \brief Converts Unicode string to string
 	///
-	/// Funkcja pomocnicza do konwersji nazw interfejsów
-	/// z formatu Unicode na standardowy string.
+	/// Helper function to convert interface names
+	/// from Unicode format to standard string.
 	///
-	/// \param unistr Wskaźnik na ciąg Unicode
+	/// \param unicode Unicode string to convert
 	///
-	/// \return std::string Przekonwertowany string
+	/// \return std::string Converted string
 	///
 	////////////////////////////////////////////////////////////
-	static std::string unicodeToString(const wchar_t* unistr);
+	std::string unicodeToString(wchar_t* unicode);
 };
 
 ////////////////////////////////////////////////////////////
-/// \brief Implementacja RawSocket dla Windows
+/// \brief Windows implementation of RawSocket
 ///
-/// Klasa ta implementuje interfejs RawSocket używając
-/// Windows API (Winsock2). Zapewnia możliwość wysyłania
-/// i odbierania pakietów sieciowych na poziomie warstwy
-/// sieciowej na platformie Windows.
+/// This class implements the RawSocket interface
+/// using Windows Winsock API. Provides raw socket
+/// functionality for sending and receiving network
+/// packets at the network layer level.
 ///
-/// Nazwa klasy "WindowsRawSocket" pochodzi od:
-/// - "Windows" - oznacza platformę Windows
-/// - "Raw" - oznacza surowe pakiety sieciowe
-/// - "Socket" - oznacza gniazdo sieciowe
+/// The class name "WindowsRawSocket" comes from:
+/// - "Windows" - denotes Windows platform
+/// - "Raw" - denotes raw/unprocessed packets
+/// - "Socket" - denotes network socket
 ///
 /// \see RawSocket, PlatformFactory
 ///
@@ -102,17 +102,17 @@ private:
 class WindowsRawSocket : public RawSocket {
 public:
 	////////////////////////////////////////////////////////////
-	/// \brief Konstruktor domyślny
+	/// \brief Default constructor
 	///
-	/// Inicjalizuje obiekt WindowsRawSocket z domyślnymi wartościami.
+	/// Initializes WindowsRawSocket object with default values.
 	///
 	////////////////////////////////////////////////////////////
 	WindowsRawSocket();
 
 	////////////////////////////////////////////////////////////
-	/// \brief Destruktor
+	/// \brief Destructor
 	///
-	/// Automatycznie zamyka socket i zwalnia zasoby Winsock.
+	/// Automatically closes socket and releases Winsock resources.
 	///
 	/// \see close()
 	///
@@ -120,15 +120,15 @@ public:
 	~WindowsRawSocket() override;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Otwiera raw socket
+	/// \brief Opens raw socket
 	///
-	/// Implementacja dla Windows używająca socket() i setsockopt()
-	/// do utworzenia raw socket z opcjonalnym trybem promiscuous.
+	/// Windows implementation using socket() and setsockopt()
+	/// to create raw socket with optional promiscuous mode.
 	///
-	/// \param interfaceName Nazwa interfejsu sieciowego
-	/// \param promiscuous Czy włączyć tryb promiscuous
+	/// \param interfaceName Network interface name
+	/// \param promiscuous Whether to enable promiscuous mode
 	///
-	/// \return bool true jeśli socket został pomyślnie otwarty
+	/// \return bool true if socket was successfully opened
 	///
 	/// \see RawSocket::open()
 	///
@@ -136,10 +136,10 @@ public:
 	bool open(const std::string& interfaceName, bool promiscuous = true) override;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Zamyka raw socket
+	/// \brief Closes raw socket
 	///
-	/// Implementacja dla Windows używająca closesocket()
-	/// i WSACleanup() do bezpiecznego zamknięcia połączenia.
+	/// Windows implementation using closesocket()
+	/// and WSACleanup() to safely close connection.
 	///
 	/// \see RawSocket::close()
 	///
@@ -147,14 +147,14 @@ public:
 	void close() override;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Wysyła pakiet przez raw socket
+	/// \brief Sends packet through raw socket
 	///
-	/// Implementacja dla Windows używająca sendto()
-	/// do wysłania danych przez raw socket.
+	/// Windows implementation using sendto()
+	/// to send data through raw socket.
 	///
-	/// \param data Dane do wysłania
+	/// \param data Data to send
 	///
-	/// \return bool true jeśli pakiet został pomyślnie wysłany
+	/// \return bool true if packet was successfully sent
 	///
 	/// \see RawSocket::sendPacket()
 	///
@@ -162,12 +162,12 @@ public:
 	bool sendPacket(const std::vector<uint8_t>& data) override;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Odbiera pakiet z raw socket
+	/// \brief Receives packet from raw socket
 	///
-	/// Implementacja dla Windows używająca recv()
-	/// do odbioru danych z raw socket.
+	/// Windows implementation using recvfrom()
+	/// to receive data from raw socket.
 	///
-	/// \return std::vector<uint8_t> Odebrane dane lub pusty vector
+	/// \return std::vector<uint8_t> Received data or empty vector
 	///
 	/// \see RawSocket::receivePacket()
 	///
@@ -175,9 +175,9 @@ public:
 	std::vector<uint8_t> receivePacket() override;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Sprawdza czy socket jest otwarty
+	/// \brief Checks if socket is open
 	///
-	/// \return bool true jeśli socket jest otwarty
+	/// \return bool true if socket is open
 	///
 	/// \see RawSocket::isOpen()
 	///
@@ -185,8 +185,8 @@ public:
 	bool isOpen() const override;
 
 private:
-	void* sock;        ///< Deskryptor gniazda Windows (SOCKET)
-	bool initialized;   ///< Czy Winsock został zainicjalizowany
+	SOCKET socket;    ///< Windows socket handle
+	bool isOpen;      ///< Whether socket is open
 };
 
 #endif // _WIN32 

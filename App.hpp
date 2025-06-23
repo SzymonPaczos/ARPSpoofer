@@ -10,21 +10,21 @@
 #include <functional>
 
 ////////////////////////////////////////////////////////////
-/// \brief Główna klasa aplikacji ARP spoofing
+/// \brief Main application class for ARP spoofing
 ///
-/// Klasa ta jest centralnym punktem aplikacji, odpowiedzialnym
-/// za koordynację wszystkich operacji ARP spoofing. Implementuje
-/// wzorzec Singleton, zapewniając że istnieje tylko jedna
-/// instancja aplikacji w całym programie.
+/// This class is the central point of the application, responsible
+/// for coordinating all ARP spoofing operations. It implements
+/// the Singleton pattern, ensuring that there is only one
+/// application instance in the entire program.
 ///
-/// Nazwa klasy "App" pochodzi od:
-/// - "App" - skrót od "Application" (aplikacja)
+/// The class name "App" comes from:
+/// - "App" - abbreviation of "Application"
 ///
-/// Klasa używa nowoczesnych funkcji C++ takich jak:
-/// - std::unique_ptr dla zarządzania zasobami
-/// - std::atomic dla bezpiecznej komunikacji między wątkami
-/// - std::function dla callbacków
-/// - RAII dla automatycznego zarządzania zasobami
+/// The class uses modern C++ features such as:
+/// - std::unique_ptr for resource management
+/// - std::atomic for thread-safe communication
+/// - std::function for callbacks
+/// - RAII for automatic resource management
 ///
 /// \see NetworkInterface, RawSocket, PlatformFactory, IPAddress
 ///
@@ -32,86 +32,86 @@
 class App {
 public:
 	////////////////////////////////////////////////////////////
-	/// \brief Struktura konfiguracji ataku
+	/// \brief Attack configuration structure
 	///
-	/// Struktura ta zawiera wszystkie parametry potrzebne
-	/// do przeprowadzenia ataku ARP spoofing.
+	/// This structure contains all parameters needed
+	/// to perform an ARP spoofing attack.
 	///
 	/// \see configureAttack()
 	///
 	////////////////////////////////////////////////////////////
 	struct AttackConfig {
-		IPAddress victimIp;         ///< Adres IP ofiary
-		IPAddress targetIp;         ///< Adres IP celu (opcjonalny)
-		std::string interfaceName;  ///< Nazwa interfejsu (opcjonalny)
-		bool oneWayMode;            ///< Tryb jednokierunkowy
-		int arpInterval;            ///< Interwał wysyłania pakietów ARP (sekundy)
+		IPAddress victimIp;         ///< Victim's IP address
+		IPAddress targetIp;         ///< Target's IP address (optional)
+		std::string interfaceName;  ///< Interface name (optional)
+		bool oneWayMode;            ///< One-way mode flag
+		int arpInterval;            ///< ARP packet interval (seconds)
 	};
 
 	////////////////////////////////////////////////////////////
-	/// \brief Struktura informacji o ataku
+	/// \brief Attack information structure
 	///
-	/// Struktura ta zawiera informacje o aktualnie
-	/// przeprowadzanym ataku.
+	/// This structure contains information about the currently
+	/// running attack.
 	///
 	/// \see getAttackInfo()
 	///
 	////////////////////////////////////////////////////////////
 	struct AttackInfo {
-		IPAddress victimIp;         ///< Adres IP ofiary
-		IPAddress targetIp;         ///< Adres IP celu
-		std::vector<uint8_t> victimMac;   ///< Adres MAC ofiary
-		std::vector<uint8_t> targetMac;   ///< Adres MAC celu
-		std::vector<uint8_t> myMac;       ///< Nasz adres MAC
-		std::string interfaceName;        ///< Nazwa interfejsu
-		bool isActive;                    ///< Czy atak jest aktywny
-		uint64_t packetsSent;             ///< Liczba wysłanych pakietów
-		uint64_t packetsReceived;         ///< Liczba odebranych pakietów
+		IPAddress victimIp;         ///< Victim's IP address
+		IPAddress targetIp;         ///< Target's IP address
+		std::vector<uint8_t> victimMac;   ///< Victim's MAC address
+		std::vector<uint8_t> targetMac;   ///< Target's MAC address
+		std::vector<uint8_t> myMac;       ///< Our MAC address
+		std::string interfaceName;        ///< Interface name
+		bool isActive;                    ///< Whether attack is active
+		uint64_t packetsSent;             ///< Number of sent packets
+		uint64_t packetsReceived;         ///< Number of received packets
 	};
 
 	////////////////////////////////////////////////////////////
-	/// \brief Typ callback dla logowania
+	/// \brief Logging callback type
 	///
-	/// Definicja typu funkcji callback używanej do logowania
-	/// zdarzeń w aplikacji.
+	/// Definition of callback function type used for logging
+	/// events in the application.
 	///
-	/// \param level Poziom logowania (0=ERROR, 1=WARN, 2=INFO, 3=DEBUG)
-	/// \param message Wiadomość do zalogowania
+	/// \param level Log level (0=ERROR, 1=WARN, 2=INFO, 3=DEBUG)
+	/// \param message Message to log
 	///
 	////////////////////////////////////////////////////////////
 	using LogCallback = std::function<void(int level, const std::string& message)>;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Typ callback dla sygnału zatrzymania
+	/// \brief Stop signal callback type
 	///
-	/// Definicja typu funkcji callback używanej do obsługi
-	/// sygnału zatrzymania ataku.
+	/// Definition of callback function type used for handling
+	/// attack stop signals.
 	///
 	////////////////////////////////////////////////////////////
 	using StopCallback = std::function<void()>;
 
 private:
-	std::unique_ptr<NetworkInterface> networkInterface; ///< Interfejs sieciowy
+	std::unique_ptr<NetworkInterface> networkInterface; ///< Network interface
 	std::unique_ptr<RawSocket> rawSocket;               ///< Raw socket
-	std::atomic<bool> stopFlag;                         ///< Flaga zatrzymania
-	std::atomic<bool> isRunning;                        ///< Czy aplikacja działa
+	std::atomic<bool> stopFlag;                         ///< Stop flag
+	std::atomic<bool> isRunning;                        ///< Whether application is running
 	
-	AttackConfig config;                                ///< Konfiguracja ataku
-	AttackInfo attackInfo;                              ///< Informacje o ataku
+	AttackConfig config;                                ///< Attack configuration
+	AttackInfo attackInfo;                              ///< Attack information
 	
-	LogCallback logCallback;                            ///< Callback dla logowania
-	StopCallback stopCallback;                          ///< Callback dla zatrzymania
+	LogCallback logCallback;                            ///< Logging callback
+	StopCallback stopCallback;                          ///< Stop callback
 
 	// Singleton pattern
-	static std::unique_ptr<App> instance;               ///< Instancja singleton
-	App();                                              ///< Prywatny konstruktor
+	static std::unique_ptr<App> instance;               ///< Singleton instance
+	App();                                              ///< Private constructor
 
 public:
 	////////////////////////////////////////////////////////////
-	/// \brief Destruktor
+	/// \brief Destructor
 	///
-	/// Automatycznie zatrzymuje atak i zwalnia zasoby
-	/// gdy obiekt App jest niszczony.
+	/// Automatically stops the attack and releases resources
+	/// when the App object is destroyed.
 	///
 	/// \see stopAttack()
 	///
@@ -119,12 +119,12 @@ public:
 	~App();
 
 	////////////////////////////////////////////////////////////
-	/// \brief Pobiera instancję singleton
+	/// \brief Gets the singleton instance
 	///
-	/// Funkcja ta zwraca referencję do jedynej instancji
-	/// klasy App (wzorzec Singleton).
+	/// This function returns a reference to the single instance
+	/// of the App class (Singleton pattern).
 	///
-	/// \return App& Referencja do instancji aplikacji
+	/// \return App& Reference to the application instance
 	///
 	/// \see ~App()
 	///
@@ -132,12 +132,12 @@ public:
 	static App& getInstance();
 
 	////////////////////////////////////////////////////////////
-	/// \brief Wyświetla listę dostępnych interfejsów sieciowych
+	/// \brief Displays list of available network interfaces
 	///
-	/// Funkcja ta pobiera i wyświetla wszystkie aktywne
-	/// interfejsy sieciowe dostępne w systemie.
+	/// This function retrieves and displays all active
+	/// network interfaces available in the system.
 	///
-	/// \return bool true jeśli operacja się powiodła
+	/// \return bool true if operation succeeded
 	///
 	/// \see NetworkInterface::getInterfaces()
 	///
@@ -145,15 +145,15 @@ public:
 	bool listInterfaces();
 
 	////////////////////////////////////////////////////////////
-	/// \brief Konfiguruje parametry ataku ARP spoofing
+	/// \brief Configures ARP spoofing attack parameters
 	///
-	/// Funkcja ta ustawia wszystkie parametry potrzebne
-	/// do przeprowadzenia ataku: adresy IP ofiary i celu,
-	/// interfejs sieciowy oraz tryb działania.
+	/// This function sets all parameters needed to perform
+	/// an attack: victim and target IP addresses, network
+	/// interface, and operation mode.
 	///
-	/// \param config Konfiguracja ataku
+	/// \param config Attack configuration
 	///
-	/// \return bool true jeśli konfiguracja się powiodła
+	/// \return bool true if configuration succeeded
 	///
 	/// \see AttackConfig, startAttack()
 	///
@@ -161,17 +161,17 @@ public:
 	bool configureAttack(const AttackConfig& config);
 
 	////////////////////////////////////////////////////////////
-	/// \brief Rozpoczyna atak ARP spoofing
+	/// \brief Starts the ARP spoofing attack
 	///
-	/// Funkcja ta rozpoczyna główną pętlę ataku, która:
-	/// 1. Wysyła fałszywe pakiety ARP w określonych interwałach
-	/// 2. Przechwytuje i przekazuje ruch sieciowy
-	/// 3. Obsługuje sygnał przerwania
+	/// This function starts the main attack loop, which:
+	/// 1. Sends fake ARP packets at specified intervals
+	/// 2. Intercepts and forwards network traffic
+	/// 3. Handles interrupt signals
 	///
-	/// Funkcja działa w pętli aż do wywołania stopAttack()
-	/// lub ustawienia flagi zatrzymania.
+	/// The function runs in a loop until stopAttack() is called
+	/// or the stop flag is set.
 	///
-	/// \return bool true jeśli atak zakończył się pomyślnie
+	/// \return bool true if attack ended successfully
 	///
 	/// \see stopAttack(), configureAttack()
 	///
@@ -179,11 +179,11 @@ public:
 	bool startAttack();
 
 	////////////////////////////////////////////////////////////
-	/// \brief Zatrzymuje atak ARP spoofing
+	/// \brief Stops the ARP spoofing attack
 	///
-	/// Funkcja ta bezpiecznie zatrzymuje atak, wysyłając
-	/// prawidłowe pakiety ARP aby przywrócić normalne
-	/// działanie sieci.
+	/// This function safely stops the attack by sending
+	/// correct ARP packets to restore normal network
+	/// operation.
 	///
 	/// \see startAttack(), configureAttack()
 	///
@@ -191,10 +191,10 @@ public:
 	void stopAttack();
 
 	////////////////////////////////////////////////////////////
-	/// \brief Ustawia flagę zatrzymania ataku
+	/// \brief Sets the attack stop flag
 	///
-	/// Funkcja ta jest wywoływana przez obsługę sygnału
-	/// aby bezpiecznie zatrzymać główną pętlę ataku.
+	/// This function is called by signal handler
+	/// to safely stop the main attack loop.
 	///
 	/// \see startAttack(), stopAttack()
 	///
@@ -202,19 +202,9 @@ public:
 	void requestStop() { stopFlag = true; }
 
 	////////////////////////////////////////////////////////////
-	/// \brief Pobiera informacje o aktualnym ataku
+	/// \brief Checks if attack is currently active
 	///
-	/// \return const AttackInfo& Referencja do informacji o ataku
-	///
-	/// \see AttackInfo
-	///
-	////////////////////////////////////////////////////////////
-	const AttackInfo& getAttackInfo() const { return attackInfo; }
-
-	////////////////////////////////////////////////////////////
-	/// \brief Sprawdza czy atak jest aktywny
-	///
-	/// \return bool true jeśli atak jest w trakcie wykonywania
+	/// \return bool true if attack is running
 	///
 	/// \see startAttack(), stopAttack()
 	///
@@ -222,9 +212,9 @@ public:
 	bool isAttackActive() const { return isRunning; }
 
 	////////////////////////////////////////////////////////////
-	/// \brief Ustawia callback dla logowania
+	/// \brief Sets the logging callback function
 	///
-	/// \param callback Funkcja callback do logowania
+	/// \param callback Function to call for logging
 	///
 	/// \see LogCallback
 	///
@@ -232,59 +222,59 @@ public:
 	void setLogCallback(LogCallback callback) { logCallback = std::move(callback); }
 
 	////////////////////////////////////////////////////////////
-	/// \brief Ustawia callback dla zatrzymania
+	/// \brief Sets the stop callback function
 	///
-	/// \param callback Funkcja callback dla zatrzymania
+	/// \param callback Function to call when attack stops
 	///
 	/// \see StopCallback
 	///
 	////////////////////////////////////////////////////////////
 	void setStopCallback(StopCallback callback) { stopCallback = std::move(callback); }
 
+	////////////////////////////////////////////////////////////
+	/// \brief Gets current attack information
+	///
+	/// \return const AttackInfo& Current attack information
+	///
+	/// \see AttackInfo
+	///
+	////////////////////////////////////////////////////////////
+	const AttackInfo& getAttackInfo() const { return attackInfo; }
+
 private:
 	////////////////////////////////////////////////////////////
-	/// \brief Tworzy pakiet ARP spoofing
+	/// \brief Creates ARP spoofing packet
 	///
-	/// Funkcja ta konstruuje kompletny pakiet ARP spoofing
-	/// składający się z nagłówka Ethernet i nagłówka ARP.
+	/// \param victimIp Victim's IP address
+	/// \param targetIp Target's IP address
+	/// \param victimMac Victim's MAC address
+	/// \param targetMac Target's MAC address
+	/// \param myMac Our MAC address
 	///
-	/// \param victimIp Adres IP ofiary
-	/// \param victimMac Adres MAC ofiary
-	/// \param spoofedIp Adres IP który fałszujemy
-	/// \param myMac Nasz adres MAC
-	///
-	/// \return std::vector<uint8_t> Skonstruowany pakiet
-	///
-	/// \see startAttack()
+	/// \return std::vector<uint8_t> ARP packet data
 	///
 	////////////////////////////////////////////////////////////
 	std::vector<uint8_t> createArpPacket(const IPAddress& victimIp,
+	                                     const IPAddress& targetIp,
 	                                     const std::vector<uint8_t>& victimMac,
-	                                     const IPAddress& spoofedIp,
+	                                     const std::vector<uint8_t>& targetMac,
 	                                     const std::vector<uint8_t>& myMac);
 
 	////////////////////////////////////////////////////////////
-	/// \brief Przetwarza odebrane pakiety
+	/// \brief Handles received network packet
 	///
-	/// Funkcja ta analizuje odebrane pakiety i decyduje
-	/// czy należy je przekazać dalej.
-	///
-	/// \param data Dane pakietu do przetworzenia
-	///
-	/// \see startAttack()
+	/// \param data Packet data
 	///
 	////////////////////////////////////////////////////////////
 	void handlePacket(const std::vector<uint8_t>& data);
 
 	////////////////////////////////////////////////////////////
-	/// \brief Loguje wiadomość
+	/// \brief Logs a message using the callback
 	///
-	/// Wywołuje callback logowania jeśli jest ustawiony.
+	/// \param level Log level
+	/// \param message Message to log
 	///
-	/// \param level Poziom logowania
-	/// \param message Wiadomość do zalogowania
-	///
-	/// \see setLogCallback()
+	/// \see LogCallback
 	///
 	////////////////////////////////////////////////////////////
 	void log(int level, const std::string& message);

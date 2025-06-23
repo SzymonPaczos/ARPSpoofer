@@ -6,16 +6,16 @@
 #include <memory>
 
 ////////////////////////////////////////////////////////////
-/// \brief Abstrakcja dla operacji sieciowych na różnych platformach
+/// \brief Abstraction for network operations on different platforms
 ///
-/// Klasa ta definiuje interfejs dla operacji sieciowych,
-/// który może być implementowany na różnych platformach
-/// (Windows, Linux, macOS). Umożliwia to pisanie kodu
-/// wieloplatformowego bez bezpośredniego używania API systemowych.
+/// This class defines an interface for network operations
+/// that can be implemented on different platforms
+/// (Windows, Linux, macOS). This enables writing
+/// cross-platform code without directly using system APIs.
 ///
-/// Nazwa klasy "NetworkInterface" pochodzi od:
-/// - "Network" - oznacza operacje sieciowe
-/// - "Interface" - oznacza interfejs/abstrakcję
+/// The class name "NetworkInterface" comes from:
+/// - "Network" - denotes network operations
+/// - "Interface" - denotes interface/abstraction
 ///
 /// \see WindowsNetworkInterface, LinuxNetworkInterface
 ///
@@ -23,40 +23,40 @@
 class NetworkInterface {
 public:
 	////////////////////////////////////////////////////////////
-	/// \brief Struktura zawierająca informacje o interfejsie sieciowym
+	/// \brief Structure containing network interface information
 	///
-	/// Struktura ta zawiera wszystkie niezbędne informacje
-	/// o interfejsie sieciowym, które są wspólne dla wszystkich
-	/// platform.
+	/// This structure contains all necessary information
+	/// about a network interface that is common to all
+	/// platforms.
 	///
 	/// \see NetworkInterface::getInterfaces()
 	///
 	////////////////////////////////////////////////////////////
 	struct InterfaceInfo {
-		std::string name;           ///< Nazwa interfejsu
-		std::string description;    ///< Opis interfejsu
-		std::vector<uint8_t> mac;   ///< Adres MAC (6 bajtów)
-		std::vector<uint8_t> ip;    ///< Adres IP (4 bajty)
-		uint8_t prefixLength;       ///< Długość prefiksu sieci
-		std::vector<uint8_t> gateway; ///< Adres bramy domyślnej
-		bool isUp;                  ///< Czy interfejs jest aktywny
+		std::string name;           ///< Interface name
+		std::string description;    ///< Interface description
+		std::vector<uint8_t> mac;   ///< MAC address (6 bytes)
+		std::vector<uint8_t> ip;    ///< IP address (4 bytes)
+		uint8_t prefixLength;       ///< Network prefix length
+		std::vector<uint8_t> gateway; ///< Default gateway address
+		bool isUp;                  ///< Whether interface is active
 	};
 
 	////////////////////////////////////////////////////////////
-	/// \brief Wirtualny destruktor
+	/// \brief Virtual destructor
 	///
-	/// Zapewnia prawidłowe zwolnienie zasobów przy dziedziczeniu.
+	/// Ensures proper resource cleanup during inheritance.
 	///
 	////////////////////////////////////////////////////////////
 	virtual ~NetworkInterface() = default;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Pobiera listę wszystkich interfejsów sieciowych
+	/// \brief Gets list of all network interfaces
 	///
-	/// Funkcja ta zwraca listę wszystkich aktywnych interfejsów
-	/// sieciowych dostępnych w systemie.
+	/// This function returns a list of all active network
+	/// interfaces available in the system.
 	///
-	/// \return std::vector<InterfaceInfo> Lista interfejsów sieciowych
+	/// \return std::vector<InterfaceInfo> List of network interfaces
 	///
 	/// \see InterfaceInfo
 	///
@@ -64,15 +64,15 @@ public:
 	virtual std::vector<InterfaceInfo> getInterfaces() = 0;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Rozwiązuje adres IP na adres MAC
+	/// \brief Resolves IP address to MAC address
 	///
-	/// Funkcja ta próbuje znaleźć adres MAC odpowiadający
-	/// podanemu adresowi IP w tablicy ARP systemu.
+	/// This function attempts to find the MAC address corresponding
+	/// to the given IP address in the system's ARP table.
 	///
-	/// \param interfaceName Nazwa interfejsu na którym szukać
-	/// \param ip Adres IP do rozstrzygnięcia
+	/// \param interfaceName Interface name to search on
+	/// \param ip IP address to resolve
 	///
-	/// \return std::vector<uint8_t> Adres MAC (6 bajtów) lub pusty vector jeśli nie znaleziono
+	/// \return std::vector<uint8_t> MAC address (6 bytes) or empty vector if not found
 	///
 	////////////////////////////////////////////////////////////
 	virtual std::vector<uint8_t> resolveMacAddress(const std::string& interfaceName, 
@@ -80,16 +80,16 @@ public:
 };
 
 ////////////////////////////////////////////////////////////
-/// \brief Abstrakcja dla raw socket na różnych platformach
+/// \brief Abstraction for raw socket on different platforms
 ///
-/// Klasa ta definiuje interfejs dla operacji raw socket,
-/// który może być implementowany na różnych platformach.
-/// Umożliwia wysyłanie i odbieranie pakietów sieciowych
-/// na poziomie warstwy sieciowej.
+/// This class defines an interface for raw socket operations
+/// that can be implemented on different platforms.
+/// Enables sending and receiving network packets
+/// at the network layer level.
 ///
-/// Nazwa klasy "RawSocket" pochodzi od:
-/// - "Raw" - oznacza surowe/nieprzetworzone pakiety
-/// - "Socket" - oznacza gniazdo sieciowe
+/// The class name "RawSocket" comes from:
+/// - "Raw" - denotes raw/unprocessed packets
+/// - "Socket" - denotes network socket
 ///
 /// \see WindowsRawSocket, LinuxRawSocket
 ///
@@ -97,22 +97,22 @@ public:
 class RawSocket {
 public:
 	////////////////////////////////////////////////////////////
-	/// \brief Wirtualny destruktor
+	/// \brief Virtual destructor
 	///
-	/// Zapewnia prawidłowe zwolnienie zasobów przy dziedziczeniu.
+	/// Ensures proper resource cleanup during inheritance.
 	///
 	////////////////////////////////////////////////////////////
 	virtual ~RawSocket() = default;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Otwiera raw socket
+	/// \brief Opens raw socket
 	///
-	/// Funkcja ta inicjalizuje raw socket na podanym interfejsie.
+	/// This function initializes a raw socket on the specified interface.
 	///
-	/// \param interfaceName Nazwa interfejsu sieciowego
-	/// \param promiscuous Czy włączyć tryb promiscuous
+	/// \param interfaceName Network interface name
+	/// \param promiscuous Whether to enable promiscuous mode
 	///
-	/// \return bool true jeśli socket został pomyślnie otwarty
+	/// \return bool true if socket was successfully opened
 	///
 	/// \see close(), sendPacket(), receivePacket()
 	///
@@ -120,9 +120,9 @@ public:
 	virtual bool open(const std::string& interfaceName, bool promiscuous = true) = 0;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Zamyka raw socket
+	/// \brief Closes raw socket
 	///
-	/// Funkcja ta bezpiecznie zamyka raw socket i zwalnia zasoby.
+	/// This function safely closes the raw socket and releases resources.
 	///
 	/// \see open()
 	///
@@ -130,11 +130,11 @@ public:
 	virtual void close() = 0;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Wysyła pakiet przez raw socket
+	/// \brief Sends packet through raw socket
 	///
-	/// \param data Dane do wysłania
+	/// \param data Data to send
 	///
-	/// \return bool true jeśli pakiet został pomyślnie wysłany
+	/// \return bool true if packet was successfully sent
 	///
 	/// \see receivePacket()
 	///
@@ -142,9 +142,9 @@ public:
 	virtual bool sendPacket(const std::vector<uint8_t>& data) = 0;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Odbiera pakiet z raw socket
+	/// \brief Receives packet from raw socket
 	///
-	/// \return std::vector<uint8_t> Odebrane dane lub pusty vector jeśli nie ma pakietów
+	/// \return std::vector<uint8_t> Received data or empty vector if no packets
 	///
 	/// \see sendPacket()
 	///
@@ -152,24 +152,24 @@ public:
 	virtual std::vector<uint8_t> receivePacket() = 0;
 
 	////////////////////////////////////////////////////////////
-	/// \brief Sprawdza czy socket jest otwarty
+	/// \brief Checks if socket is open
 	///
-	/// \return bool true jeśli socket jest otwarty
+	/// \return bool true if socket is open
 	///
 	////////////////////////////////////////////////////////////
 	virtual bool isOpen() const = 0;
 };
 
 ////////////////////////////////////////////////////////////
-/// \brief Fabryka dla tworzenia implementacji platformowych
+/// \brief Factory for creating platform-specific implementations
 ///
-/// Klasa ta tworzy odpowiednie implementacje dla aktualnej
-/// platformy. Umożliwia to dynamiczne wybieranie implementacji
-/// w zależności od systemu operacyjnego.
+/// This class creates appropriate implementations for the current
+/// platform. This enables dynamic selection of implementations
+/// depending on the operating system.
 ///
-/// Nazwa klasy "PlatformFactory" pochodzi od:
-/// - "Platform" - oznacza platformę systemową
-/// - "Factory" - oznacza wzorzec projektowy fabryki
+/// The class name "PlatformFactory" comes from:
+/// - "Platform" - denotes system platform
+/// - "Factory" - denotes factory design pattern
 ///
 /// \see NetworkInterface, RawSocket
 ///
@@ -177,9 +177,9 @@ public:
 class PlatformFactory {
 public:
 	////////////////////////////////////////////////////////////
-	/// \brief Tworzy implementację NetworkInterface dla aktualnej platformy
+	/// \brief Creates NetworkInterface implementation for current platform
 	///
-	/// \return std::unique_ptr<NetworkInterface> Implementacja dla aktualnej platformy
+	/// \return std::unique_ptr<NetworkInterface> Implementation for current platform
 	///
 	/// \see NetworkInterface
 	///
@@ -187,9 +187,9 @@ public:
 	static std::unique_ptr<NetworkInterface> createNetworkInterface();
 
 	////////////////////////////////////////////////////////////
-	/// \brief Tworzy implementację RawSocket dla aktualnej platformy
+	/// \brief Creates RawSocket implementation for current platform
 	///
-	/// \return std::unique_ptr<RawSocket> Implementacja dla aktualnej platformy
+	/// \return std::unique_ptr<RawSocket> Implementation for current platform
 	///
 	/// \see RawSocket
 	///
