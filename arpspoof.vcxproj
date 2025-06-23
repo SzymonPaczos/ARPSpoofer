@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>arpspoof_modern</RootNamespace>
+    <RootNamespace>arpspoof</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -104,7 +104,6 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -141,7 +140,6 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -160,17 +158,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main_modern.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="ArpSpoofer.cpp" />
+    <ClCompile Include="IPAddress.cpp" />
     <ClCompile Include="PlatformFactory.cpp" />
     <ClCompile Include="WindowsPlatform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp" />
+    <ClInclude Include="ArpSpoofer.hpp" />
+    <ClInclude Include="IPAddress.hpp" />
     <ClInclude Include="PlatformAbstraction.hpp" />
-    <ClInclude Include="PlatformFactory.hpp" />
     <ClInclude Include="WindowsPlatform.hpp" />
     <ClInclude Include="NetworkHeaders.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

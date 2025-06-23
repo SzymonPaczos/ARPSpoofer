@@ -1,4 +1,4 @@
-# ARP Spoofing Tool - Nowoczesna wersja C++
+# ARP Spoofing Tool - C++
 
 Nowoczesna implementacja narzędzia ARP spoofing napisana w C++17, wykorzystująca inteligentne wskaźniki, atomiki, callbacki i wzorce projektowe. Program jest wieloplatformowy i nie wymaga zewnętrznych zależności.
 
@@ -83,9 +83,9 @@ arpspoof/
 ├── WindowsPlatform.hpp/cpp        # Implementacja Windows
 ├── PlatformFactory.cpp            # Fabryka komponentów
 ├── NetworkHeaders.hpp             # Definicje nagłówków sieciowych
-├── main_modern.cpp                # Główny plik wykonywalny
-├── arpspoof_modern.vcxproj        # Projekt Visual Studio
-└── README_modern.md               # Ten plik
+├── main.cpp                       # Główny plik wykonywalny
+├── arpspoof.vcxproj               # Projekt Visual Studio
+└── README.md                      # Ten plik
 ```
 
 ## 🚀 **Kompilacja**
@@ -96,7 +96,7 @@ arpspoof/
 - Uprawnienia administratora
 
 ### **Kompilacja**
-1. Otwórz `arpspoof_modern.vcxproj` w Visual Studio
+1. Otwórz `arpspoof.vcxproj` w Visual Studio
 2. Wybierz konfigurację Release x64
 3. Skompiluj projekt (Ctrl+Shift+B)
 
@@ -104,7 +104,7 @@ arpspoof/
 
 ### **Podstawowa składnia**
 ```bash
-arpspoof_modern.exe [OPCJE] <victim-ip> [target-ip]
+arpspoof.exe [OPCJE] <victim-ip> [target-ip]
 ```
 
 ### **Opcje**
@@ -119,27 +119,27 @@ arpspoof_modern.exe [OPCJE] <victim-ip> [target-ip]
 
 **Lista interfejsów:**
 ```bash
-arpspoof_modern.exe --list
+arpspoof.exe --list
 ```
 
 **Podstawowy atak (ofiara -> brama):**
 ```bash
-arpspoof_modern.exe 192.168.1.10
+arpspoof.exe 192.168.1.10
 ```
 
 **Atak z określonym celem:**
 ```bash
-arpspoof_modern.exe 192.168.1.10 192.168.1.1
+arpspoof.exe 192.168.1.10 192.168.1.1
 ```
 
 **Tryb jednokierunkowy:**
 ```bash
-arpspoof_modern.exe --oneway 192.168.1.10
+arpspoof.exe --oneway 192.168.1.10
 ```
 
 **Określony interfejs i interwał:**
 ```bash
-arpspoof_modern.exe -i "Ethernet" -t 5 192.168.1.10
+arpspoof.exe -i "Ethernet" -t 5 192.168.1.10
 ```
 
 ## 🔧 **Funkcje**
