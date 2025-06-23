@@ -8,6 +8,15 @@
 #include <iphlpapi.h>
 #include <cstring>
 #include <cstdio>
+#include <limits>
+
+#ifndef SO_RCVALL
+#define SO_RCVALL 0x98000001
+#endif
+
+#ifndef INVALID_SOCKET
+#define INVALID_SOCKET (SOCKET)(~0)
+#endif
 
 std::vector<NetworkInterface::InterfaceInfo> WindowsNetworkInterface::getInterfaces() {
 	std::vector<InterfaceInfo> interfaces;
@@ -159,11 +168,15 @@ void WindowsRawSocket::close() {
 bool WindowsRawSocket::sendPacket(const std::vector<uint8_t>& data) {
 	if (sock == INVALID_SOCKET) return false;
 	
+	if (data.size() > static_cast<size_t>((std::numeric_limits<int>::max)())) {
+		return false; // Za duże dane
+	}
+	
 	sockaddr_in addr = { 0 };
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = INADDR_ANY;
 	
-	int result = sendto((SOCKET)sock, (char*)data.data(), (int)data.size(), 0, 
+	int result = sendto((SOCKET)sock, (char*)data.data(), static_cast<int>(data.size()), 0, 
 	                    (sockaddr*)&addr, sizeof(addr));
 	return result != SOCKET_ERROR;
 }
@@ -172,7 +185,11 @@ std::vector<uint8_t> WindowsRawSocket::receivePacket() {
 	if (sock == INVALID_SOCKET) return {};
 	
 	std::vector<uint8_t> buffer(65536);
-	int result = recv((SOCKET)sock, (char*)buffer.data(), (int)buffer.size(), 0);
+	if (buffer.size() > static_cast<size_t>((std::numeric_limits<int>::max)())) {
+		return {}; // Za duży bufor
+	}
+	
+	int result = recv((SOCKET)sock, (char*)buffer.data(), static_cast<int>(buffer.size()), 0);
 	
 	if (result == SOCKET_ERROR) {
 		return {};

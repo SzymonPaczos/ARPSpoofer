@@ -4,6 +4,11 @@
 
 #ifdef _WIN32
 
+#include <winsock2.h>
+#include <ws2def.h>
+#include <ws2ipdef.h>
+#include <iphlpapi.h>
+
 ////////////////////////////////////////////////////////////
 /// \brief Windows implementation of NetworkInterface
 ///
@@ -80,7 +85,7 @@ private:
 	/// \return std::string Converted string
 	///
 	////////////////////////////////////////////////////////////
-	std::string unicodeToString(wchar_t* unicode);
+	std::string unicodeToString(const wchar_t* unicode);
 };
 
 ////////////////////////////////////////////////////////////
@@ -185,8 +190,8 @@ public:
 	bool isOpen() const override;
 
 private:
-	SOCKET socket;    ///< Windows socket handle
-	bool isOpen;      ///< Whether socket is open
+	SOCKET sock;        ///< Windows socket handle
+	bool initialized;   ///< Whether Winsock is initialized
 };
 
 #endif // _WIN32 

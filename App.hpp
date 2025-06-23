@@ -8,6 +8,7 @@
 #include <vector>
 #include <atomic>
 #include <functional>
+#include <utility>
 
 ////////////////////////////////////////////////////////////
 /// \brief Main application class for ARP spoofing
@@ -104,9 +105,17 @@ private:
 
 	// Singleton pattern
 	static std::unique_ptr<App> instance;               ///< Singleton instance
-	App();                                              ///< Private constructor
 
 public:
+	////////////////////////////////////////////////////////////
+	/// \brief Constructor
+	///
+	/// Private constructor for Singleton pattern.
+	/// Initializes the application with default values.
+	///
+	////////////////////////////////////////////////////////////
+	App();
+
 	////////////////////////////////////////////////////////////
 	/// \brief Destructor
 	///
@@ -254,11 +263,12 @@ private:
 	/// \return std::vector<uint8_t> ARP packet data
 	///
 	////////////////////////////////////////////////////////////
-	std::vector<uint8_t> createArpPacket(const IPAddress& victimIp,
-	                                     const IPAddress& targetIp,
-	                                     const std::vector<uint8_t>& victimMac,
-	                                     const std::vector<uint8_t>& targetMac,
-	                                     const std::vector<uint8_t>& myMac);
+	std::vector<uint8_t> createArpPacket(
+		const IPAddress& victimIp,
+		const std::vector<uint8_t>& victimMac,
+		const IPAddress& spoofedIp,
+		const std::vector<uint8_t>& myMac
+	);
 
 	////////////////////////////////////////////////////////////
 	/// \brief Handles received network packet

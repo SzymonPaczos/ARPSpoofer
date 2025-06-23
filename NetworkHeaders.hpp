@@ -16,10 +16,10 @@
 /// \see IpHeader, ArpHeader
 ///
 ////////////////////////////////////////////////////////////
-struct EthHeader {
+struct EthernetHeader {
 	uint8_t dest[6];    ///< Destination MAC address (6 bytes)
 	uint8_t src[6];     ///< Source MAC address (6 bytes)
-	uint16_t ethertype; ///< Protocol type (0x0800 for IP, 0x0806 for ARP)
+	uint16_t type;       ///< Protocol type (0x0800 for IP, 0x0806 for ARP)
 };
 
 ////////////////////////////////////////////////////////////
@@ -47,8 +47,8 @@ struct IpHeader {
 	uint8_t ttl;            ///< Time to live
 	uint8_t protocol;       ///< Higher layer protocol
 	uint16_t checksum;      ///< Header checksum
-	uint32_t src_ip;        ///< Source IP address
-	uint32_t dest_ip;       ///< Destination IP address
+	uint32_t src;           ///< Source IP address
+	uint32_t dest;          ///< Destination IP address
 };
 
 ////////////////////////////////////////////////////////////
@@ -67,15 +67,15 @@ struct IpHeader {
 ///
 ////////////////////////////////////////////////////////////
 struct ArpHeader {
-	uint16_t hw_type;       ///< Hardware type (1 for Ethernet)
-	uint16_t proto_type;    ///< Protocol type (0x0800 for IP)
-	uint8_t hw_size;        ///< Hardware address size (6 for MAC)
-	uint8_t proto_size;     ///< Protocol address size (4 for IP)
-	uint16_t opcode;        ///< Operation code (1=request, 2=reply)
-	uint8_t sender_mac[6];  ///< Sender MAC address
-	uint32_t sender_ip;     ///< Sender IP address
-	uint8_t target_mac[6];  ///< Target MAC address
-	uint32_t target_ip;     ///< Target IP address
+	uint16_t hardware_type;       ///< Hardware type (1 for Ethernet)
+	uint16_t protocol_type;       ///< Protocol type (0x0800 for IP)
+	uint8_t hardware_size;        ///< Hardware address size (6 for MAC)
+	uint8_t protocol_size;        ///< Protocol address size (4 for IP)
+	uint16_t opcode;               ///< Operation code (1=request, 2=reply)
+	uint8_t sender_mac[6];         ///< Sender MAC address
+	uint8_t sender_ip[4];          ///< Sender IP address
+	uint8_t target_mac[6];         ///< Target MAC address
+	uint8_t target_ip[4];          ///< Target IP address
 };
 
 // Network constants

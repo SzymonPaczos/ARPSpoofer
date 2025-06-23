@@ -1,10 +1,9 @@
-#include "PlatformFactory.hpp"
+#include "PlatformAbstraction.hpp"
+#include <memory>
 
 #ifdef _WIN32
 #include "WindowsPlatform.hpp"
-#endif
-
-#ifdef __linux__
+#elif defined(__linux__)
 #include "LinuxPlatform.hpp"
 #endif
 

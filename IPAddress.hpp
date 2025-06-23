@@ -246,6 +246,20 @@ public:
 	IPAddress operator~() const;
 
 	////////////////////////////////////////////////////////////
+	/// \brief Bitwise XOR operator
+	///
+	/// Performs bitwise XOR operation between two IP addresses.
+	///
+	/// \param other IP address to XOR with
+	///
+	/// \return IPAddress Result of XOR operation
+	///
+	/// \see operator&(), operator|(), operator~()
+	///
+	////////////////////////////////////////////////////////////
+	IPAddress operator^(const IPAddress& other) const;
+
+	////////////////////////////////////////////////////////////
 	/// \brief Array access operator (non-const)
 	///
 	/// Provides access to individual bytes of IP address.
@@ -328,6 +342,78 @@ public:
 	///
 	////////////////////////////////////////////////////////////
 	IPAddress operator-(uint32_t value) const;
+
+	////////////////////////////////////////////////////////////
+	/// \brief Pre-increment operator
+	///
+	/// Increments the IP address by 1.
+	///
+	/// \return IPAddress& Reference to this object
+	///
+	/// \see operator++(int), operator--()
+	///
+	////////////////////////////////////////////////////////////
+	IPAddress& operator++();
+
+	////////////////////////////////////////////////////////////
+	/// \brief Post-increment operator
+	///
+	/// Increments the IP address by 1.
+	///
+	/// \return IPAddress Copy of this object before increment
+	///
+	/// \see operator++(), operator--(int)
+	///
+	////////////////////////////////////////////////////////////
+	IPAddress operator++(int);
+
+	////////////////////////////////////////////////////////////
+	/// \brief Pre-decrement operator
+	///
+	/// Decrements the IP address by 1.
+	///
+	/// \return IPAddress& Reference to this object
+	///
+	/// \see operator--(int), operator++()
+	///
+	////////////////////////////////////////////////////////////
+	IPAddress& operator--();
+
+	////////////////////////////////////////////////////////////
+	/// \brief Post-decrement operator
+	///
+	/// Decrements the IP address by 1.
+	///
+	/// \return IPAddress Copy of this object before decrement
+	///
+	/// \see operator--(), operator++(int)
+	///
+	////////////////////////////////////////////////////////////
+	IPAddress operator--(int);
+
+	////////////////////////////////////////////////////////////
+	/// \brief String conversion operator
+	///
+	/// Converts IP address to string representation.
+	///
+	/// \return std::string String representation of IP address
+	///
+	/// \see toString()
+	///
+	////////////////////////////////////////////////////////////
+	operator std::string() const;
+
+	////////////////////////////////////////////////////////////
+	/// \brief Vector conversion operator
+	///
+	/// Converts IP address to byte vector.
+	///
+	/// \return std::vector<uint8_t> Byte vector representation
+	///
+	/// \see toBytes()
+	///
+	////////////////////////////////////////////////////////////
+	operator std::vector<uint8_t>() const;
 
 	////////////////////////////////////////////////////////////
 	/// \brief Checks if IP address is valid
