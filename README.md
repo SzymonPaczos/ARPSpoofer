@@ -4,7 +4,7 @@ A modern, cross-platform ARP spoofing tool written in C++17. This tool demonstra
 
 ## Features
 
-- **Cross-platform support**: Windows and Linux
+- **Cross-platform support**: Windows, Linux, and macOS
 - **Modern C++17**: Uses modern C++ features and best practices
 - **Object-oriented design**: Clean architecture with proper abstraction
 - **Raw socket support**: Direct network packet manipulation
@@ -17,7 +17,7 @@ A modern, cross-platform ARP spoofing tool written in C++17. This tool demonstra
 The application uses a platform abstraction layer that provides:
 - `NetworkInterface`: Interface for network operations
 - `RawSocket`: Interface for raw socket operations
-- Platform-specific implementations for Windows and Linux
+- Platform-specific implementations for Windows, Linux, and macOS
 
 ### Class Structure
 
@@ -27,10 +27,12 @@ App (Main application logic)
 ├── PlatformFactory (Creates platform-specific objects)
 ├── NetworkInterface (Abstract interface)
 │   ├── WindowsNetworkInterface (Windows implementation)
-│   └── LinuxNetworkInterface (Linux implementation)
+│   ├── LinuxNetworkInterface (Linux implementation)
+│   └── MacOSNetworkInterface (macOS implementation)
 └── RawSocket (Abstract interface)
     ├── WindowsRawSocket (Windows implementation)
-    └── LinuxRawSocket (Linux implementation)
+    ├── LinuxRawSocket (Linux implementation)
+    └── MacOSRawSocket (macOS implementation)
 ```
 
 ## Building
@@ -39,6 +41,7 @@ App (Main application logic)
 
 - **Windows**: Visual Studio 2019 or later with C++17 support
 - **Linux**: GCC 7+ or Clang 5+ with C++17 support
+- **macOS**: Xcode Command Line Tools or Clang 5+ with C++17 support
 
 ### Windows Build
 
@@ -73,6 +76,49 @@ App (Main application logic)
        -o arpspoof
    ```
 
+### macOS Build
+
+1. **Install Xcode Command Line Tools** (if not already installed):
+   ```bash
+   xcode-select --install
+   ```
+
+2. **Compile the application**:
+   ```bash
+   make
+   ```
+
+3. **Install system-wide** (optional):
+   ```bash
+   sudo make install
+   ```
+
+4. **Alternative compilation**:
+   ```bash
+   clang++ -std=c++17 -Wall -Wextra -O2 -D__APPLE__ \
+       main.cpp App.cpp ArpSpoofer.cpp IPAddress.cpp \
+       PlatformFactory.cpp MacOSPlatform.cpp \
+       -o arpspoof
+   ```
+
+### macOS Build with Xcode
+
+1. **Open the Xcode project**:
+   ```bash
+   open arpspoof.xcodeproj
+   ```
+
+2. **Configure launch arguments** (optional):
+   - Product → Scheme → Edit Scheme
+   - Run → Arguments → Arguments Passed On Launch
+   - Add: `en0 192.168.1.100 192.168.1.1`
+
+3. **Build and run**:
+   - Cmd + B (Build)
+   - Cmd + R (Run)
+
+**Note**: The Xcode project provides a professional development environment with debugging, profiling, and static analysis tools. See `XCODE_README.md` for detailed instructions.
+
 ## Usage
 
 ### Windows
@@ -92,6 +138,16 @@ sudo ./arpspoof [interface_name] [target_ip] [spoofed_ip]
 sudo arpspoof [interface_name] [target_ip] [spoofed_ip]
 ```
 
+### macOS
+
+```bash
+# Run with sudo (required for BPF access)
+sudo ./arpspoof [interface_name] [target_ip] [spoofed_ip]
+
+# If installed system-wide
+sudo arpspoof [interface_name] [target_ip] [spoofed_ip]
+```
+
 ### Examples
 
 ```bash
@@ -100,6 +156,9 @@ sudo ./arpspoof eth0 192.168.1.100 192.168.1.1
 
 # Spoof target to gateway (reverse direction)
 sudo ./arpspoof eth0 192.168.1.1 192.168.1.100
+
+# On macOS, interface might be en0, en1, etc.
+sudo ./arpspoof en0 192.168.1.100 192.168.1.1
 ```
 
 ## Security Notice
@@ -118,6 +177,11 @@ sudo ./arpspoof eth0 192.168.1.1 192.168.1.100
 - Requires root privileges (sudo)
 - Supports most Linux distributions
 
+### macOS
+- Uses BPF (Berkeley Packet Filter) for packet capture
+- Requires root privileges (sudo)
+- Supports macOS 10.14+ (Mojave and later)
+
 ## Development
 
 ### Project Structure
@@ -132,10 +196,11 @@ arpa/
 ├── PlatformFactory.cpp     # Factory for platform objects
 ├── WindowsPlatform.hpp/cpp # Windows implementation
 ├── LinuxPlatform.hpp/cpp   # Linux implementation
+├── MacOSPlatform.hpp/cpp   # macOS implementation
 ├── NetworkHeaders.hpp      # Network protocol headers
 ├── arpspoof.sln           # Visual Studio solution
 ├── arpspoof.vcxproj       # Visual Studio project
-├── Makefile               # Linux build script
+├── Makefile               # Cross-platform build script
 ├── README.md              # This file
 └── UML_Diagram.md         # Class diagram
 ```
@@ -148,6 +213,7 @@ To add support for a new platform:
 2. Implement `NetworkInterface` and `RawSocket` interfaces
 3. Update `PlatformFactory.cpp` to include the new platform
 4. Add appropriate preprocessor definitions
+5. Update `Makefile` with platform detection and compilation flags
 
 ## License
 
@@ -158,7 +224,7 @@ This project is for educational purposes. Use responsibly and only on networks y
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test on both Windows and Linux
+4. Test on Windows, Linux, and macOS
 5. Submit a pull request
 
 ## Troubleshooting
@@ -174,13 +240,33 @@ This project is for educational purposes. Use responsibly and only on networks y
 - "Interface not found" - Check interface name with `ip link show`
 - "Operation not permitted" - Ensure CAP_NET_RAW capability
 
+**macOS:**
+- "Permission denied" - Use sudo
+- "Interface not found" - Check interface name with `ifconfig`
+- "BPF device not available" - Ensure running with root privileges
+- "Operation not permitted" - Check System Integrity Protection (SIP) settings
+
 ### Debug Mode
 
-**Linux:**
+**Linux/macOS:**
 ```bash
 make debug
 sudo ./arpspoof [args]
 ```
 
 **Windows:**
-Build in Debug configuration in Visual Studio 
+Build in Debug configuration in Visual Studio
+
+### Platform Detection
+
+Use the `make info` command to see detected platform and build configuration:
+
+```bash
+make info
+```
+
+This will show:
+- Detected platform (Windows/Linux/macOS)
+- Compiler being used
+- Compiler and linker flags
+- Source files being compiled 

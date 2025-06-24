@@ -2,7 +2,7 @@
 
 ## Overview
 
-This diagram shows the class structure and relationships in the ARP spoofing tool, including both Windows and Linux platform implementations.
+This diagram shows the class structure and relationships in the ARP spoofing tool, including Windows, Linux, and macOS platform implementations.
 
 ## Class Diagram
 
@@ -89,6 +89,18 @@ classDiagram
         -std::vector~uint8_t~ getDefaultGateway(const std::string& interfaceName)
     }
 
+    class MacOSNetworkInterface {
+        +MacOSNetworkInterface()
+        +~MacOSNetworkInterface()
+        +std::vector~InterfaceInfo~ getInterfaces() override
+        +std::vector~uint8_t~ resolveMacAddress(const std::string& interfaceName, const std::vector~uint8_t~& ip) override
+        -int getInterfaceFlags(const std::string& interfaceName)
+        -std::vector~uint8_t~ getInterfaceMacAddress(const std::string& interfaceName)
+        -std::vector~uint8_t~ getInterfaceIpAddress(const std::string& interfaceName)
+        -uint8_t getInterfaceNetmask(const std::string& interfaceName)
+        -std::vector~uint8_t~ getDefaultGateway(const std::string& interfaceName)
+    }
+
     class WindowsRawSocket {
         -SOCKET socketHandle
         -bool isOpen
@@ -108,6 +120,19 @@ classDiagram
         -std::string interfaceName
         +LinuxRawSocket()
         +~LinuxRawSocket()
+        +bool open(const std::string& interfaceName, bool promiscuous = true) override
+        +void close() override
+        +bool sendPacket(const std::vector~uint8_t~& data) override
+        +std::vector~uint8_t~ receivePacket() override
+        +bool isOpen() const override
+    }
+
+    class MacOSRawSocket {
+        -int bpfFd
+        -bool isOpen
+        -std::string interfaceName
+        +MacOSRawSocket()
+        +~MacOSRawSocket()
         +bool open(const std::string& interfaceName, bool promiscuous = true) override
         +void close() override
         +bool sendPacket(const std::vector~uint8_t~& data) override
@@ -155,8 +180,10 @@ classDiagram
     PlatformFactory --> RawSocket : creates
     NetworkInterface <|-- WindowsNetworkInterface : implements
     NetworkInterface <|-- LinuxNetworkInterface : implements
+    NetworkInterface <|-- MacOSNetworkInterface : implements
     RawSocket <|-- WindowsRawSocket : implements
     RawSocket <|-- LinuxRawSocket : implements
+    RawSocket <|-- MacOSRawSocket : implements
     ArpSpoofer --> NetworkInterface : uses
     ArpSpoofer --> RawSocket : uses
     ArpSpoofer --> IPAddress : uses
@@ -191,7 +218,8 @@ The application uses a platform abstraction layer to support multiple operating 
 
 - **Windows**: Uses WinPcap/Npcap APIs and Windows socket functions
 - **Linux**: Uses native Linux socket API and system calls
-- **Future**: Easy to extend for macOS, BSD, etc.
+- **macOS**: Uses BPF (Berkeley Packet Filter) API and sysctl system calls
+- **Future**: Easy to extend for BSD, Solaris, etc.
 
 ## Cross-Platform Features
 
@@ -199,4 +227,21 @@ The application uses a platform abstraction layer to support multiple operating 
 - **MAC Address Resolution**: ARP table lookup and request sending
 - **Raw Socket Operations**: Direct packet manipulation
 - **Error Handling**: Platform-specific error codes and messages
-- **Memory Management**: Smart pointers for automatic cleanup 
+- **Memory Management**: Smart pointers for automatic cleanup
+
+## Platform-Specific Implementations
+
+### Windows
+- Uses WinPcap/Npcap for packet capture
+- Windows socket API for network operations
+- Registry and WMI for interface information
+
+### Linux
+- Native socket API with AF_PACKET
+- ioctl calls for interface configuration
+- /proc filesystem for system information
+
+### macOS
+- BPF (Berkeley Packet Filter) for packet capture
+- sysctl API for system information
+- BSD socket API for network operations 
