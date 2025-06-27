@@ -46,6 +46,7 @@ public:
 		IPAddress targetIp;         ///< Target's IP address (optional)
 		std::string interfaceName;  ///< Interface name (optional)
 		bool oneWayMode;            ///< One-way mode flag
+		bool dropMode;              ///< Drop packets instead of forwarding
 		int arpInterval;            ///< ARP packet interval (seconds)
 	};
 
@@ -68,6 +69,7 @@ public:
 		bool isActive;                    ///< Whether attack is active
 		uint64_t packetsSent;             ///< Number of sent packets
 		uint64_t packetsReceived;         ///< Number of received packets
+		uint64_t packetsDropped;          ///< Number of dropped packets
 	};
 
 	////////////////////////////////////////////////////////////
@@ -231,7 +233,7 @@ public:
 	void setLogCallback(LogCallback callback) { logCallback = std::move(callback); }
 
 	////////////////////////////////////////////////////////////
-	/// \brief Sets the stop callback function
+	/// \brief Sets the stop signal callback function
 	///
 	/// \param callback Function to call when attack stops
 	///
@@ -243,7 +245,7 @@ public:
 	////////////////////////////////////////////////////////////
 	/// \brief Gets current attack information
 	///
-	/// \return const AttackInfo& Current attack information
+	/// \return const AttackInfo& Reference to attack information
 	///
 	/// \see AttackInfo
 	///

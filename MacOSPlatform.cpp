@@ -279,7 +279,7 @@ uint8_t MacOSNetworkInterface::getInterfaceNetmask(const std::string& interfaceN
 	
 	::close(sock);
 	
-	struct sockaddr_in* addr = (struct sockaddr_in*)&ifr.ifr_netmask;
+	struct sockaddr_in* addr = (struct sockaddr_in*)&ifr.ifr_addr;
 	uint32_t netmask = ntohl(addr->sin_addr.s_addr);
 	
 	// Convert netmask to prefix length
@@ -353,7 +353,7 @@ std::vector<uint8_t> MacOSNetworkInterface::getDefaultGateway(const std::string&
 ///
 ////////////////////////////////////////////////////////////
 
-MacOSRawSocket::MacOSRawSocket() : bpfFd(-1), isOpen(false) {
+MacOSRawSocket::MacOSRawSocket() : bpfFd(-1) {
 }
 
 MacOSRawSocket::~MacOSRawSocket() {
@@ -413,20 +413,18 @@ bool MacOSRawSocket::open(const std::string& interfaceName, bool promiscuous) {
 	}
 	
 	this->interfaceName = interfaceName;
-	isOpen = true;
 	return true;
 }
 
 void MacOSRawSocket::close() {
-	if (isOpen && bpfFd >= 0) {
+	if (bpfFd >= 0) {
 		::close(bpfFd);
 		bpfFd = -1;
-		isOpen = false;
 	}
 }
 
 bool MacOSRawSocket::sendPacket(const std::vector<uint8_t>& data) {
-	if (!isOpen || bpfFd < 0) {
+	if (bpfFd < 0) {
 		return false;
 	}
 	
@@ -435,7 +433,7 @@ bool MacOSRawSocket::sendPacket(const std::vector<uint8_t>& data) {
 }
 
 std::vector<uint8_t> MacOSRawSocket::receivePacket() {
-	if (!isOpen || bpfFd < 0) {
+	if (bpfFd < 0) {
 		return {};
 	}
 	
@@ -468,7 +466,7 @@ std::vector<uint8_t> MacOSRawSocket::receivePacket() {
 }
 
 bool MacOSRawSocket::isOpen() const {
-	return isOpen && bpfFd >= 0;
+	return bpfFd >= 0;
 }
 
 #endif // __APPLE__ 

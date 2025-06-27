@@ -251,7 +251,6 @@ public:
 
 private:
 	int bpfFd;        ///< macOS BPF file descriptor
-	bool isOpen;      ///< Whether socket is open
 	std::string interfaceName; ///< Interface name
 };
 

@@ -50,6 +50,7 @@ void showHelp(const std::string& programName) {
 	std::cout << "  --list, -l          Display list of network interfaces\n";
 	std::cout << "  --interface, -i     Specify network interface\n";
 	std::cout << "  --oneway, -o        One-way attack only\n";
+	std::cout << "  --drop, -d          Drop packets instead of forwarding (cuts internet)\n";
 	std::cout << "  --interval, -t      ARP packet interval (seconds, default 2)\n";
 	std::cout << "  --verbose, -v       Detailed logging\n\n";
 	std::cout << "Arguments:\n";
@@ -63,6 +64,7 @@ void showHelp(const std::string& programName) {
 	std::cout << "  " << programName << " 192.168.1.10\n";
 	std::cout << "  " << programName << " -i eth0 192.168.1.10\n";
 	std::cout << "  " << programName << " --oneway 192.168.1.10\n";
+	std::cout << "  " << programName << " --drop 192.168.1.10 (odcina internet)\n";
 	std::cout << "  " << programName << " -t 5 192.168.1.10 192.168.1.1\n";
 	std::cout << "  " << programName << " (tryb interaktywny)\n\n";
 	std::cout << "WARNING: Program requires administrator privileges!\n";
@@ -98,6 +100,7 @@ void showHelp(const std::string& programName) {
 bool parseArguments(int argc, char* argv[], App::AttackConfig& config) {
 	// Default values
 	config.oneWayMode = false;
+	config.dropMode = false;
 	config.arpInterval = 2;
 	
 	for (int i = 1; i < argc; ++i) {
@@ -141,6 +144,9 @@ bool parseArguments(int argc, char* argv[], App::AttackConfig& config) {
 		}
 		else if (arg == "--verbose" || arg == "-v") {
 			// TODO: Implement verbose mode
+		}
+		else if (arg == "--drop" || arg == "-d") {
+			config.dropMode = true;
 		}
 		else if (arg[0] != '-') {
 			// This is an IP address
@@ -189,6 +195,7 @@ bool interactiveInput(App::AttackConfig& config) {
 	
 	// Default values
 	config.oneWayMode = false;
+	config.dropMode = false;
 	config.arpInterval = 2;
 	
 	// Victim IP
@@ -246,6 +253,36 @@ bool interactiveInput(App::AttackConfig& config) {
 		}
 	} while (true);
 	
+	// Drop mode
+	std::string dropStr;
+	do {
+		std::cout << "Czy chcesz odrzucić pakiety? (t/n, domyślnie n): ";
+		std::cout << "UWAGA: To odetnie internet między urządzeniami! ";
+		std::getline(std::cin, dropStr);
+		
+		if (dropStr.empty()) {
+			config.dropMode = false;
+			break;
+		} else if (dropStr == "t" || dropStr == "T" || dropStr == "tak" || dropStr == "TAK") {
+			std::cout << "OSTRZEŻENIE: Tryb porzucania pakietów odetnie internet!\n";
+			std::cout << "Czy na pewno chcesz kontynuować? (t/n): ";
+			std::string confirm;
+			std::getline(std::cin, confirm);
+			if (confirm == "t" || confirm == "T" || confirm == "tak" || confirm == "TAK") {
+				config.dropMode = true;
+				break;
+			} else {
+				config.dropMode = false;
+				break;
+			}
+		} else if (dropStr == "n" || dropStr == "N" || dropStr == "nie" || dropStr == "NIE") {
+			config.dropMode = false;
+			break;
+		} else {
+			std::cout << "Błąd: Wprowadź 't' lub 'n'.\n";
+		}
+	} while (true);
+	
 	// Interval
 	std::string intervalStr;
 	do {
@@ -284,6 +321,7 @@ bool interactiveInput(App::AttackConfig& config) {
 		std::cout << "Interfejs: automatyczne wykrycie\n";
 	}
 	std::cout << "Tryb jednokierunkowy: " << (config.oneWayMode ? "tak" : "nie") << "\n";
+	std::cout << "Odrzucanie pakietów: " << (config.dropMode ? "tak" : "nie") << "\n";
 	std::cout << "Interwał ARP: " << config.arpInterval << " sekund\n";
 	
 	// Confirm
