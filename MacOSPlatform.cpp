@@ -4,6 +4,7 @@
 
 #include <cstring>
 #include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <sstream>
 #include <algorithm>
@@ -165,9 +166,86 @@ std::vector<uint8_t> MacOSNetworkInterface::resolveMacAddress(const std::string&
 	
 	free(buf);
 	
-	// If not found in ARP table, send ARP request
-	// Note: This is a simplified implementation
-	// In a real implementation, you would need to send ARP request and wait for response
+	// If not found in ARP table, try to ping the device to populate ARP table
+	// This is a simple workaround - send a ping to force ARP resolution
+	std::string ipStr = std::to_string(ip[0]) + "." + std::to_string(ip[1]) + "." + 
+	                   std::to_string(ip[2]) + "." + std::to_string(ip[3]);
+	
+	std::string pingCmd = "ping -c 1 -W 1000 " + ipStr + " > /dev/null 2>&1";
+	if (system(pingCmd.c_str()) == 0) {
+		// Ping succeeded, try to get MAC from ARP table again
+		if (sysctl(mib, 6, NULL, &len, NULL, 0) >= 0) {
+			if ((buf = (char*)malloc(len)) != NULL) {
+				if (sysctl(mib, 6, buf, &len, NULL, 0) >= 0) {
+					lim = buf + len;
+					for (next = buf; next < lim; next += rtm->rtm_msglen) {
+						rtm = (struct rt_msghdr *)next;
+						if (rtm->rtm_type == RTM_GET) {
+							sa = (struct sockaddr *)(rtm + 1);
+							
+							if (sa->sa_family == AF_INET) {
+								struct sockaddr_in *sin = (struct sockaddr_in *)sa;
+								
+								std::vector<uint8_t> arpIp(4);
+								memcpy(arpIp.data(), &sin->sin_addr.s_addr, 4);
+								
+								if (arpIp == ip) {
+									sa = (struct sockaddr *)((char *)sa + sizeof(struct sockaddr_in));
+									if (sa->sa_family == AF_LINK) {
+										struct sockaddr_dl *sdl = (struct sockaddr_dl *)sa;
+										if (sdl->sdl_alen == 6) {
+											std::vector<uint8_t> mac(6);
+											memcpy(mac.data(), LLADDR(sdl), 6);
+											free(buf);
+											return mac;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				free(buf);
+			}
+		}
+	}
+	
+	// If still not found, try using arp command
+	std::string arpCmd = "arp -n " + ipStr + " | grep " + ipStr;
+	FILE* pipe = popen(arpCmd.c_str(), "r");
+	if (pipe) {
+		char buffer[128];
+		std::string result = "";
+		while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
+			result += buffer;
+		}
+		pclose(pipe);
+		
+		// Parse MAC address from arp output
+		// Format: IP address at MAC address on interface
+		size_t atPos = result.find(" at ");
+		if (atPos != std::string::npos) {
+			size_t onPos = result.find(" on ", atPos);
+			if (onPos != std::string::npos) {
+				std::string macStr = result.substr(atPos + 4, onPos - atPos - 4);
+				// Parse MAC address (format: xx:xx:xx:xx:xx:xx)
+				std::vector<uint8_t> mac;
+				std::istringstream macStream(macStr);
+				std::string byteStr;
+				
+				while (std::getline(macStream, byteStr, ':')) {
+					if (byteStr.length() == 2) {
+						mac.push_back(std::stoi(byteStr, nullptr, 16));
+					}
+				}
+				
+				if (mac.size() == 6) {
+					return mac;
+				}
+			}
+		}
+	}
+	
 	return {};
 }
 
